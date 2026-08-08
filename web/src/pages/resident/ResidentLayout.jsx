@@ -9,18 +9,12 @@ export default function ResidentLayout() {
     const { unreadCount } = useResidentNotifications();
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-24 pt-20">
+        <div className="min-h-screen bg-slate-50 font-sans pb-20 pt-20">
             {/* Top Header */}
             <div className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
                 <div className="flex justify-between items-center h-16 px-5 max-w-lg mx-auto">
                     <div className="flex items-center gap-3">
-                        {user?.barangay?.logo_path ? (
-                            <img src={`http://127.0.0.1:8000/${user.barangay.logo_path}`} alt="Logo" className="w-8 h-8 object-contain" />
-                        ) : (
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
-                                B
-                            </div>
-                        )}
+                        <img src={user?.barangay?.logo_path ? (user.barangay.logo_path.startsWith('http') ? user.barangay.logo_path : `${import.meta.env.VITE_API_BASE_URL.replace(/\/api$/, '')}/${user.barangay.logo_path}`) : '/logo.jpg'} alt="Logo" className="w-8 h-8 object-contain" onError={(e) => { e.target.src = '/logo.jpg'; }} />
                         <div>
                             <h1 className="text-sm font-black text-slate-900 tracking-tight leading-none">BarangayLink</h1>
                             <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">{user?.barangay?.name || 'Resident App'}</p>
@@ -46,7 +40,7 @@ export default function ResidentLayout() {
             
             <div className="fixed bottom-0 left-0 w-full z-50">
                 <nav className="bg-white/90 backdrop-blur-xl border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] w-full pb-safe">
-                    <div className="flex justify-around items-center h-[85px] px-2 max-w-lg mx-auto pb-6 pt-2">
+                    <div className="flex justify-around items-center h-[65px] px-2 max-w-lg mx-auto pb-2 pt-1">
                         <Link to="/resident" className={`flex flex-col items-center justify-center w-[72px] h-full gap-1 transition-colors ${location.pathname === '/resident' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
                             <div className={`flex items-center justify-center rounded-2xl transition-all duration-300 ${location.pathname === '/resident' ? 'bg-blue-100/80 w-14 h-8' : 'bg-transparent w-8 h-8'}`}>
                                 <Home size={22} strokeWidth={location.pathname === '/resident' ? 2.5 : 2} />

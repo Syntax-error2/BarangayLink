@@ -140,9 +140,9 @@ export default function Chatbot() {
     };
 
     return (
-        <div className="max-w-lg mx-auto flex flex-col min-h-[calc(100vh-80px)] bg-slate-50 pb-32">
+        <div className="max-w-lg mx-auto flex flex-col min-h-screen bg-slate-50 pb-32">
             {/* Header */}
-            <div className="bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 shrink-0 z-20">
+            <div className="fixed top-16 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 z-30">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
@@ -159,7 +159,7 @@ export default function Chatbot() {
             </div>
 
             {/* Chat Area */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-5 pb-28 hide-scrollbar">
+            <div className="flex-1 overflow-y-auto p-5 space-y-5 pt-28 pb-32 hide-scrollbar">
                 {messages.map((msg) => (
                     <div key={msg.id} className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
                         {msg.role === 'ai' ? (
@@ -193,7 +193,7 @@ export default function Chatbot() {
             </div>
 
             {/* Input Area */}
-            <div className="absolute bottom-0 left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-200/60 p-4 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-[65px] left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-200/60 p-4 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                 <div className="flex gap-2 bg-slate-100 p-1.5 rounded-full border border-slate-200/50">
                     <input 
                         type="text" 

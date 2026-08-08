@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
-import { CheckCircle2, ChevronRight, AlertTriangle, ShieldAlert, Car, Trash2, Flame } from 'lucide-react';
+import { CheckCircle2, ChevronRight, AlertTriangle, ShieldAlert, Car, Trash2, Flame, CloudRain, Sun, Bell } from 'lucide-react';
 
 export default function Reports() {
     const [reports, setReports] = useState([]);
@@ -64,10 +64,13 @@ export default function Reports() {
     // Helper to map generic categories to nice icons and colors
     const getReportIcon = (name) => {
         const n = name.toLowerCase();
-        if (n.includes('crime') || n.includes('security')) return { icon: ShieldAlert, color: 'text-red-600', bg: 'bg-red-50', hover: 'hover:border-red-200 hover:shadow-[0_8px_30px_rgb(220,38,38,0.15)]' };
+        if (n.includes('crime') || n.includes('security') || n.includes('safety')) return { icon: ShieldAlert, color: 'text-red-600', bg: 'bg-red-50', hover: 'hover:border-red-200 hover:shadow-[0_8px_30px_rgb(220,38,38,0.15)]' };
         if (n.includes('traffic') || n.includes('road')) return { icon: Car, color: 'text-amber-600', bg: 'bg-amber-50', hover: 'hover:border-amber-200 hover:shadow-[0_8px_30px_rgb(217,119,6,0.15)]' };
         if (n.includes('waste') || n.includes('garbage')) return { icon: Trash2, color: 'text-emerald-600', bg: 'bg-emerald-50', hover: 'hover:border-emerald-200 hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)]' };
         if (n.includes('fire')) return { icon: Flame, color: 'text-orange-600', bg: 'bg-orange-50', hover: 'hover:border-orange-200 hover:shadow-[0_8px_30px_rgb(234,88,12,0.15)]' };
+        if (n.includes('flood') || n.includes('water')) return { icon: CloudRain, color: 'text-cyan-600', bg: 'bg-cyan-50', hover: 'hover:border-cyan-200 hover:shadow-[0_8px_30px_rgb(6,182,212,0.15)]' };
+        if (n.includes('light') || n.includes('electric') || n.includes('power')) return { icon: Sun, color: 'text-yellow-600', bg: 'bg-yellow-50', hover: 'hover:border-yellow-200 hover:shadow-[0_8px_30px_rgb(234,179,8,0.15)]' };
+        if (n.includes('noise')) return { icon: Bell, color: 'text-purple-600', bg: 'bg-purple-50', hover: 'hover:border-purple-200 hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)]' };
         return { icon: AlertTriangle, color: 'text-blue-600', bg: 'bg-blue-50', hover: 'hover:border-blue-200 hover:shadow-[0_8px_30px_rgb(37,99,235,0.15)]' };
     };
 

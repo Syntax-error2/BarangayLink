@@ -32,7 +32,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-6 min-h-screen pb-32">
+        <div className="max-w-lg mx-auto px-6 pt-4 pb-32 min-h-screen">
             <h2 className="text-3xl font-black text-text-primary tracking-tight mb-6">My Profile</h2>
 
             {/* Flat ID Card */}
