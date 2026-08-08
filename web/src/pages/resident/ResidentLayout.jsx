@@ -15,7 +15,7 @@ export default function ResidentLayout() {
                 <div className="flex justify-between items-center h-16 px-5 max-w-lg mx-auto">
                     <div className="flex items-center gap-3">
                         {user?.barangay?.logo_path ? (
-                            <img src={`http://127.0.0.1:8000/${user.barangay.logo_path}`} alt="Logo" className="w-8 h-8 object-contain" />
+                            <img src={`https://lavender-clam-996039.hostingersite.com/${user.barangay.logo_path}`} alt="Logo" className="w-8 h-8 object-contain" />
                         ) : (
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
                                 B
