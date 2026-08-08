@@ -59,7 +59,7 @@ export default function PrintableDocument({ request }) {
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-15 print:opacity-20 z-0" style={{ WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' }}>
                     <div className="w-16 h-16 rounded-full border border-gray-200 p-1 flex-shrink-0">
                         <img 
-                        src={`https://lavender-clam-996039.hostingersite.com/${barangay.logo_path}`} 
+                        src={`http://127.0.0.1:8000/${barangay.logo_path}`} 
                         alt="Barangay Logo" 
                         className="w-full h-full object-contain rounded-full"
                         />

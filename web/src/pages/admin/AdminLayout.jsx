@@ -32,7 +32,7 @@ export default function AdminLayout() {
                 <div className="p-8 border-b border-slate-100/50 flex flex-col items-center">
                     <div className="w-16 h-16 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex items-center justify-center p-[2px] border border-slate-100 mb-4 overflow-hidden">
                         <img 
-                            src={user?.barangay?.logo_path ? `https://lavender-clam-996039.hostingersite.com/${user.barangay.logo_path}` : "/logo.jpg"} 
+                            src={user?.barangay?.logo_path ? `http://127.0.0.1:8000/${user.barangay.logo_path}` : "/logo.jpg"} 
                             alt="Barangay Logo" 
                             className="w-full h-full object-contain rounded-[14px]" 
                         />

@@ -14,7 +14,7 @@ export default function Settings() {
     const [logoSuccess, setLogoSuccess] = useState(false);
     const [logoError, setLogoError] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(
-        user?.barangay?.logo_path ? `https://lavender-clam-996039.hostingersite.com/${user.barangay.logo_path}` : null
+        user?.barangay?.logo_path ? `http://127.0.0.1:8000/${user.barangay.logo_path}` : null
     );
     const fileInputRef = useRef(null);
 
