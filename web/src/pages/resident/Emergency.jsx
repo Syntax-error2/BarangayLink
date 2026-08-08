@@ -139,7 +139,7 @@ export default function Chatbot() {
     };
 
     return (
-        <div className="max-w-lg mx-auto flex flex-col min-h-screen bg-slate-50 pt-4 pb-32">
+        <div className="max-w-lg mx-auto flex flex-col min-h-[calc(100vh-80px)] bg-slate-50 pb-32">
             {/* Header */}
             <div className="bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 shrink-0 z-20">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
