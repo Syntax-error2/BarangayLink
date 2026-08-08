@@ -23,7 +23,7 @@ jobs:
           
       - name: Install Web Dependencies
         working-directory: ./web
-        run: npm ci
+        run: npm install
 
       - name: Build Web Project
         working-directory: ./web
@@ -35,8 +35,6 @@ jobs:
           distribution: 'zulu'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
 
       - name: Sync Capacitor
         working-directory: ./web
