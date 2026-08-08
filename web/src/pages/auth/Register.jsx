@@ -178,29 +178,58 @@ export default function Register() {
                             {errors.email && <p className="text-xs text-red-500 mt-1 ml-1">{errors.email}</p>}
                         </div>
 
-                        <div>
+                        <div className="relative">
                             <label className="block text-xs font-semibold text-slate-700 mb-1.5 ml-1">Select Your Barangay</label>
+                            
                             <div className="relative">
                                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                                     <MapPin className="h-5 w-5 text-slate-400" />
                                 </div>
-                                <select
-                                    name="barangay_id" 
-                                    className={`w-full rounded-2xl bg-white border ${errors.barangay_id ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-500'} pl-11 pr-10 py-3.5 text-sm ${formData.barangay_id ? 'text-slate-900' : 'text-slate-400'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm appearance-none relative z-0`}
-                                    value={formData.barangay_id} onChange={handleChange}
+                                
+                                <button
+                                    type="button"
+                                    onClick={() => setErrors(prev => ({...prev, dropdownOpen: !errors.dropdownOpen}))}
+                                    className={`w-full text-left rounded-2xl bg-white border ${errors.barangay_id ? 'border-red-300 focus:ring-red-500' : 'border-slate-200 focus:ring-blue-500'} pl-11 pr-10 py-3.5 text-sm ${formData.barangay_id ? 'text-slate-900' : 'text-slate-400'} focus:outline-none focus:ring-2 focus:border-transparent transition-all shadow-sm`}
                                 >
-                                    <option value="" disabled>Choose a barangay...</option>
-                                    {barangays.map(b => (
-                                        <option key={b.id} value={b.id} className="text-slate-900">{b.name}</option>
-                                    ))}
-                                </select>
+                                    {formData.barangay_id 
+                                        ? barangays.find(b => b.id === parseInt(formData.barangay_id))?.name || "Choose a barangay..."
+                                        : "Choose a barangay..."
+                                    }
+                                </button>
+                                
                                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-10">
-                                    <ChevronDown className="h-5 w-5 text-slate-400" />
+                                    <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform ${errors.dropdownOpen ? 'rotate-180' : ''}`} />
                                 </div>
                             </div>
+
+                            {/* Custom Dropdown Menu */}
+                            {errors.dropdownOpen && (
+                                <div className="absolute top-[calc(100%+8px)] left-0 w-full bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-h-60 overflow-y-auto">
+                                    {barangays.length === 0 ? (
+                                        <div className="p-4 text-center text-sm text-slate-500">Loading barangays...</div>
+                                    ) : (
+                                        <ul className="py-1">
+                                            {barangays.map(b => (
+                                                <li key={b.id}>
+                                                    <button
+                                                        type="button"
+                                                        className={`w-full text-left px-5 py-3 text-sm hover:bg-blue-50 transition-colors ${formData.barangay_id == b.id ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700'}`}
+                                                        onClick={() => {
+                                                            handleChange({ target: { name: 'barangay_id', value: b.id.toString() }});
+                                                            setErrors(prev => ({...prev, dropdownOpen: false}));
+                                                        }}
+                                                    >
+                                                        {b.name}
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            )}
+
                             {errors.barangay_id && <p className="text-xs text-red-500 mt-1 ml-1">{errors.barangay_id}</p>}
                         </div>
-                        
                         <div>
                             <label className="block text-xs font-semibold text-slate-700 mb-1.5 ml-1">Password</label>
                             <div className="relative">
