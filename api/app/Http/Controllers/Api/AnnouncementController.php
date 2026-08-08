@@ -37,6 +37,34 @@ class AnnouncementController extends Controller
             'is_active' => true,
         ]);
 
+        // Trigger Proactive AI Alert
+        $lowerTitle = strtolower($announcement->title);
+        $lowerContent = strtolower($announcement->content);
+        $aiMessage = null;
+
+        if (str_contains($lowerTitle, 'typhoon') || str_contains($lowerTitle, 'storm') || str_contains($lowerContent, 'typhoon')) {
+            $aiMessage = "Hello! A typhoon warning was just issued for our Barangay. Should I pull up the nearest evacuation center for you?";
+        } elseif (str_contains($lowerTitle, 'flood') || str_contains($lowerContent, 'flood')) {
+            $aiMessage = "Hi there, a flood warning was just announced. Do you want me to check the emergency dispatch numbers or safe routes?";
+        } elseif (str_contains($lowerTitle, 'water') || str_contains($lowerTitle, 'power')) {
+            $aiMessage = "Hello, a utility interruption was just announced. Do you want me to check the expected restoration time or report a localized outage?";
+        }
+
+        if ($aiMessage) {
+            // Find residents in the same barangay
+            $residents = \App\Models\User::whereHas('role', function($q) {
+                $q->where('slug', 'resident')->orWhere('name', 'Resident');
+            })->where('barangay_id', $user->barangay_id)->get();
+
+            if ($residents->count() === 0) {
+                // Fallback if role mapping is different
+                $residents = \App\Models\User::where('role_id', 3) // Assuming 3 is resident
+                    ->where('barangay_id', $user->barangay_id)->get();
+            }
+
+            \Illuminate\Support\Facades\Notification::send($residents, new \App\Notifications\ProactiveAiAlert($aiMessage, $announcement->title, $announcement->id));
+        }
+
         return response()->json($announcement, 201);
     }
 }

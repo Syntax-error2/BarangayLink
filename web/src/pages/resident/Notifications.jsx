@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Bell, CheckCircle2, AlertCircle, FileText, Briefcase, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, CheckCircle2, AlertCircle, FileText, Briefcase, Check, Sparkles } from 'lucide-react';
 import api from '../../lib/axios';
 import { useResidentNotifications } from '../../context/ResidentNotificationContext';
 
 export default function ResidentNotifications() {
+    const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const { fetchUnreadCount } = useResidentNotifications();
@@ -48,13 +50,26 @@ export default function ResidentNotifications() {
     const getIcon = (type) => {
         if (type === 'Service') return <Briefcase size={20} className="text-blue-600" />;
         if (type === 'Report') return <AlertCircle size={20} className="text-amber-600" />;
+        if (type === 'ai_proactive_alert') return <Sparkles size={20} className="text-violet-600" />;
         return <Bell size={20} className="text-slate-600" />;
     };
 
     const getBgColor = (type) => {
         if (type === 'Service') return 'bg-blue-100';
         if (type === 'Report') return 'bg-amber-100';
+        if (type === 'ai_proactive_alert') return 'bg-violet-100';
         return 'bg-slate-100';
+    };
+
+    const handleNotificationClick = async (n) => {
+        const isUnread = !n.read_at;
+        if (isUnread) {
+            await markAsRead(n.id);
+        }
+        
+        if (n.data?.type === 'ai_proactive_alert') {
+            navigate('/resident/sos', { state: { aiMessage: n.data.message } });
+        }
     };
 
     if (loading) {
@@ -100,8 +115,8 @@ export default function ResidentNotifications() {
                         return (
                             <div 
                                 key={n.id}
-                                onClick={() => isUnread && markAsRead(n.id)}
-                                className={`bg-white rounded-3xl p-5 transition-all border ${isUnread ? 'border-blue-200 shadow-[0_8px_30px_rgba(37,99,235,0.08)] cursor-pointer' : 'border-slate-100 opacity-70'} flex gap-4 items-start`}
+                                onClick={() => handleNotificationClick(n)}
+                                className={`bg-white rounded-3xl p-5 transition-all border ${isUnread ? 'border-blue-200 shadow-[0_8px_30px_rgba(37,99,235,0.08)] cursor-pointer' : 'border-slate-100 opacity-70 cursor-pointer'} flex gap-4 items-start`}
                             >
                                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${getBgColor(data.type)}`}>
                                     {getIcon(data.type)}
@@ -109,9 +124,9 @@ export default function ResidentNotifications() {
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start mb-1">
                                         <h3 className={`text-sm font-bold ${isUnread ? 'text-slate-900' : 'text-slate-700'}`}>
-                                            {data.type} Update
+                                            {data.type === 'ai_proactive_alert' ? data.title || 'AI Assistant' : `${data.type} Update`}
                                         </h3>
-                                        <span className="text-[10px] font-bold text-slate-400">
+                                        <span className="text-[10px] font-bold text-slate-400 shrink-0 ml-2">
                                             {new Date(n.created_at).toLocaleDateString()}
                                         </span>
                                     </div>

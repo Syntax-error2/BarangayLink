@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Sparkles, Send, Bot, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/axios';
@@ -7,6 +7,7 @@ import api from '../../lib/axios';
 export default function Chatbot() {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [userData, setUserData] = useState({ reports: [], services: [] });
@@ -15,7 +16,7 @@ export default function Chatbot() {
         {
             id: 1,
             role: 'ai',
-            content: `Hello ${user?.first_name || 'Resident'}! I'm your BarangayLink AI Assistant. I can check the status of your reports, help you find services, or dispatch emergency protocols. What can I do for you today?`
+            content: location.state?.aiMessage || `Hello ${user?.first_name || 'Resident'}! I'm your BarangayLink AI Assistant. I can check the status of your reports, help you find services, or dispatch emergency protocols. What can I do for you today?`
         }
     ]);
 
