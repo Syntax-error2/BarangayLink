@@ -92,14 +92,14 @@ export default function GISMap() {
                     100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
                 }
             `}</style>
-            <div className="absolute top-0 left-0 w-full z-10 p-6 bg-white shadow-sm border-b border-border pt-12 pb-4 flex items-center justify-between">
+            <div className="absolute top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-bold text-text-primary tracking-tight">Community Map</h2>
                     {brgyHallLoc && <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{user?.barangay?.name} Hall Pinned</p>}
                 </div>
                 {userLoc && <span className="badge badge-info bg-blue-50 text-blue-600 border-none font-bold text-xs">GPS Active</span>}
             </div>
-            <div className="absolute inset-0 z-0 bg-gray-100 pt-[80px]">
+            <div className="absolute inset-0 z-0 bg-gray-100 pt-[140px] pb-[85px]">
                 <MapContainer center={center} zoom={16} style={{ height: '100%', width: '100%' }} zoomControl={false}>
                     <ChangeView center={center} />
                     <TileLayer
