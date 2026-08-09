@@ -78,7 +78,7 @@ function App() {
                             </Route>
                             <Route path="/admin" element={<ProtectedRoute allowedRoles={['super-admin', 'barangay-admin', 'staff', 'responder']}><AdminLayout /></ProtectedRoute>}>
                                 <Route index element={<AdminDashboard />} />
-                                <Route path="map" element={<AdminMap />} />
+                                <Route path="heatmap" element={<AdminMap />} />
                                 <Route path="analytics" element={<AdminAnalytics />} />
                                 <Route path="reports" element={<AdminReports />} />
                                 <Route path="services" element={<AdminServices />} />

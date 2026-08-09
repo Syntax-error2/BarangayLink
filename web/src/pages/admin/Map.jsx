@@ -1,17 +1,20 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Filter, Layers, AlertCircle, FileText } from 'lucide-react';
 import api from '../../lib/axios';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Fix Leaflet default icon issue in React
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+// Fix Leaflet default icon issue in React robustly
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
 });
+L.Marker.prototype.options.icon = DefaultIcon;
 
 // Heatmap Layer Component
 const HeatmapLayer = ({ points }) => {
@@ -22,11 +25,15 @@ const HeatmapLayer = ({ points }) => {
         let heatLayer = null;
         
         const loadHeatmap = async () => {
-            if (!window.L) window.L = L;
-            await import('leaflet.heat');
-            
-            const heatPoints = points.map(p => [p.lat, p.lng, p.intensity || 1]);
-            heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
+            try {
+                if (!window.L) window.L = L;
+                await import('leaflet.heat');
+                
+                const heatPoints = points.map(p => [parseFloat(p.lat) || 0, parseFloat(p.lng) || 0, p.intensity || 1]);
+                heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
+            } catch (err) {
+                console.error("Failed to load heatmap:", err);
+            }
         };
         
         loadHeatmap();
@@ -66,6 +73,10 @@ export default function AdminMap() {
     });
 
     const defaultCenter = [10.1983, 122.8688];
+
+    const safeCenter = points.length > 0 && points[0].lat && points[0].lng 
+        ? [parseFloat(points[0].lat), parseFloat(points[0].lng)] 
+        : defaultCenter;
 
     return (
         <div className="flex flex-col h-[calc(100vh-160px)]">
@@ -121,7 +132,7 @@ export default function AdminMap() {
                     </div>
                 )}
                 <MapContainer 
-                    center={points.length > 0 ? [points[0].lat, points[0].lng] : defaultCenter} 
+                    center={safeCenter} 
                     zoom={14} 
                     style={{ height: '100%', width: '100%' }}
                 >
