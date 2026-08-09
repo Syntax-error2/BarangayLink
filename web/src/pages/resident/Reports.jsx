@@ -27,7 +27,16 @@ export default function Reports() {
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [description, setDescription] = useState('');
-    const [locationInput, setLocationInput] = useState('Poblacion, Barangay San Isidro');
+    
+    // Auto-fill location from dashboard location permission if available
+    const [locationInput, setLocationInput] = useState(() => {
+        try {
+            const data = JSON.parse(sessionStorage.getItem('weatherData'));
+            return data?.locationName || '';
+        } catch {
+            return '';
+        }
+    });
 
     const submitReport = async () => {
         if (!selectedCategory) return alert("Please select an issue type.");

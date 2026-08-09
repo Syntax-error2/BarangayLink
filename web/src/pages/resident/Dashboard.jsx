@@ -107,18 +107,49 @@ export default function ResidentDashboard() {
                         <h2 className="text-xl font-bold text-slate-900 tracking-tight">Hello, {user?.first_name || 'Resident'}! 👋</h2>
                         <p className="text-sm font-medium text-slate-500 mt-0.5">Welcome to BarangayLink</p>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 border-2 border-white shadow-sm overflow-hidden shrink-0">
-                        {user?.profile?.avatar_url ? (
-                            <img src={user.profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                        ) : (
-                            <UserIcon size={20} />
-                        )}
-                    </div>
+                    <button 
+                        onClick={() => navigate('/resident/notifications')}
+                        className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 border-2 border-white shadow-sm overflow-hidden shrink-0 transition-transform active:scale-95"
+                    >
+                        <Bell size={20} />
+                    </button>
                 </div>
+
+                {/* Location Prompt Banner */}
+                {locationState === 'prompt' && (
+                    <Card className="p-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between shadow-[0_8px_30px_rgb(37,99,235,0.2)]">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                                <MapPin size={20} />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-sm">Enable Location</h4>
+                                <p className="text-[11px] font-medium text-blue-100 opacity-90">For nearby services & better reporting</p>
+                            </div>
+                        </div>
+                        <button onClick={enableLocation} className="px-3 py-1.5 bg-white text-blue-600 font-bold text-xs rounded-full hover:scale-105 transition-transform active:scale-95">
+                            Allow
+                        </button>
+                    </Card>
+                )}
+                {locationState === 'loading' && (
+                    <Card className="p-4 bg-blue-50 text-blue-600 flex items-center justify-center border-dashed">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
+                            <span className="text-xs font-bold uppercase tracking-wider">Locating you...</span>
+                        </div>
+                    </Card>
+                )}
+                {locationState === 'granted' && weatherData && (
+                    <div className="flex items-center gap-2 mb-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <MapPin size={12} className="text-blue-500" />
+                        {weatherData.locationName} • {weatherData.temp}°C
+                    </div>
+                )}
 
                 {/* Announcements Banner */}
                 <section>
-                    <SectionHeader title="Announcements" className="mb-3" action={<button className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Top to view all</button>} />
+                    <SectionHeader title="Announcements" className="mb-3" action={<button onClick={() => navigate('/resident/notifications')} className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Tap to view all</button>} />
                     <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x hide-scrollbar -mx-5 px-5">
                         {loadingData ? (
                             <Card className="min-w-[280px] p-5 snap-start">
@@ -132,7 +163,7 @@ export default function ResidentDashboard() {
                             </Card>
                         ) : (
                             announcements.map((ann) => (
-                                <Card key={ann.id} className="min-w-[300px] p-5 snap-start relative overflow-hidden bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                                <Card key={ann.id} className="min-w-[300px] p-5 snap-start relative overflow-hidden bg-gradient-to-br from-blue-50 to-white border-blue-100" onClick={() => navigate('/resident/notifications')}>
                                     <div className="flex justify-between items-start mb-2">
                                         <h4 className="font-bold text-slate-900 text-sm line-clamp-2 pr-6">{ann.title}</h4>
                                         <div className="absolute top-4 right-4 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 opacity-50">
@@ -184,9 +215,9 @@ export default function ResidentDashboard() {
 
                 {/* Nearby Services */}
                 <section>
-                    <SectionHeader title="Nearby Services" className="mb-3" action={<button className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">View All</button>} />
+                    <SectionHeader title="Nearby Services" className="mb-3" action={<button onClick={() => navigate('/resident/map')} className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">View All</button>} />
                     <div className="space-y-3">
-                        <Card className="p-4 flex items-center gap-4 hover:border-blue-100">
+                        <Card onClick={() => navigate('/resident/map')} className="p-4 flex items-center gap-4 hover:border-blue-100 cursor-pointer transition-colors active:scale-[0.98]">
                             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
                                 <Briefcase size={20} strokeWidth={1.5} />
                             </div>
@@ -196,12 +227,12 @@ export default function ResidentDashboard() {
                             </div>
                             <ChevronRight size={16} className="text-slate-400" />
                         </Card>
-                        <Card className="p-4 flex items-center gap-4 hover:border-blue-100">
+                        <Card onClick={() => navigate('/resident/map')} className="p-4 flex items-center gap-4 hover:border-blue-100 cursor-pointer transition-colors active:scale-[0.98]">
                             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-                                <Briefcase size={20} strokeWidth={1.5} />
+                                <Building size={20} strokeWidth={1.5} />
                             </div>
                             <div className="flex-1">
-                                <h4 className="font-bold text-sm text-slate-900">Day Care Center</h4>
+                                <h4 className="font-bold text-sm text-slate-900">Barangay Hall</h4>
                                 <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mt-0.5"><MapPin size={10} /> 0.8 km away</p>
                             </div>
                             <ChevronRight size={16} className="text-slate-400" />

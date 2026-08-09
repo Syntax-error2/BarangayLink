@@ -71,7 +71,7 @@ export default function Profile() {
                 <div className="space-y-4">
                     <Card className="overflow-hidden">
                         <div className="p-2 space-y-1">
-                            <button className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                            <button onClick={() => navigate('/resident/reports')} className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                                         <AlertTriangle size={20} strokeWidth={1.5} />
@@ -81,7 +81,7 @@ export default function Profile() {
                                 <ChevronRight size={18} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
                             </button>
                             
-                            <button className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                            <button onClick={() => navigate('/resident/services')} className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
                                         <Briefcase size={20} strokeWidth={1.5} />
@@ -91,7 +91,7 @@ export default function Profile() {
                                 <ChevronRight size={18} className="text-slate-400 group-hover:text-indigo-600 transition-colors" />
                             </button>
                             
-                            <button className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                            <button onClick={() => navigate('/resident/services')} className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-100 transition-colors">
                                         <FileText size={20} strokeWidth={1.5} />
@@ -115,7 +115,7 @@ export default function Profile() {
                                 <ChevronRight size={18} className="text-slate-400 group-hover:text-slate-900 transition-colors" />
                             </button>
                             
-                            <button className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                            <button onClick={() => alert('Please contact support@barangaylink.com for assistance.')} className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
                                         <HelpCircle size={20} strokeWidth={1.5} />
@@ -125,7 +125,7 @@ export default function Profile() {
                                 <ChevronRight size={18} className="text-slate-400 group-hover:text-slate-900 transition-colors" />
                             </button>
                             
-                            <button className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                            <button onClick={() => alert('BarangayLink v1.0.0 - A Premium Citizen Services App')} className="w-full flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
                                         <Info size={20} strokeWidth={1.5} />
