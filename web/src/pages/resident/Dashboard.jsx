@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, FileText, AlertTriangle, Bell, Clock, Sun, Moon, CloudSun, CloudRain, MapPin, Thermometer, ChevronRight, Compass, Briefcase, Sparkles } from 'lucide-react';
+import { LogOut, FileText, AlertTriangle, Bell, Clock, Sun, Moon, CloudSun, CloudRain, MapPin, Thermometer, ChevronRight, Compass, Briefcase, Sparkles, HeartPulse, User as UserIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/axios';
+import Card from '../../components/ui/Card';
+import SectionHeader from '../../components/ui/SectionHeader';
+import StatusBadge from '../../components/ui/StatusBadge';
 
 export default function ResidentDashboard() {
     const { user, logout } = useAuth();
@@ -95,129 +98,123 @@ export default function ResidentDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-background font-sans pb-24 selection:bg-primary selection:text-white">
-            
-            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Dashboard</h2>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{timeContext.greeting}</p>
-                </div>
-            </div>
-
-            <main className="p-6 pt-[88px] max-w-lg mx-auto space-y-6">
-                {/* Clean Flat Greeting */}
-                <div className="flex justify-between items-end">
+        <div className="min-h-screen bg-slate-50 font-sans pb-24 selection:bg-blue-600 selection:text-white">
+            <main className="p-5 max-w-lg mx-auto space-y-6 pt-6">
+                
+                {/* Header: Greeting & Avatar */}
+                <div className="flex justify-between items-center mb-2">
                     <div>
-                        <h2 className="text-3xl font-black text-text-primary tracking-tight">Hello, {user?.first_name}</h2>
+                        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Hello, {user?.first_name || 'Resident'}! 👋</h2>
+                        <p className="text-sm font-medium text-slate-500 mt-0.5">Welcome to BarangayLink</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 border-2 border-white shadow-sm overflow-hidden shrink-0">
+                        {user?.profile?.avatar_url ? (
+                            <img src={user.profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                            <UserIcon size={20} />
+                        )}
                     </div>
                 </div>
 
-                {/* Flat Location Widget */}
-                {locationState === 'denied' ? (
-                     <div className="card bg-gray-50 border-dashed border-gray-300 p-5 flex flex-col items-center text-center gap-3">
-                         <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                             <MapPin size={24} />
-                         </div>
-                         <div>
-                             <h3 className="font-bold text-text-primary text-sm">Location Access Denied</h3>
-                             <p className="text-xs text-text-secondary mt-1">Enable location permissions in your browser to unlock local insights.</p>
-                         </div>
-                     </div>
-                ) : locationState === 'loading' ? (
-                    <div className="card bg-white/70 p-6 flex flex-col items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-3"></div>
-                        <p className="text-sm font-semibold text-primary">Locating...</p>
-                    </div>
-                ) : locationState === 'granted' ? (
-                     <div className="card p-6 flex justify-between items-center">
-                         <div className="flex items-center gap-4">
-                             <div className="w-12 h-12 bg-blue-50/80 backdrop-blur-sm rounded-2xl flex items-center justify-center text-blue-600">
-                                 {weatherData?.temp > 28 ? <Sun size={24} /> : (weatherData?.temp > 22 ? <CloudSun size={24} /> : <CloudRain size={24} />)}
-                             </div>
-                             <div>
-                                 <h3 className="text-2xl font-black text-text-primary">{weatherData?.temp ? `${weatherData.temp}°C` : 'Connected'}</h3>
-                                 <p className="text-text-secondary font-bold text-xs uppercase tracking-widest flex items-center gap-1 mt-0.5 truncate max-w-[150px]">
-                                     <MapPin size={10} className="shrink-0" /> {weatherData?.locationName || 'Local Area'}
-                                 </p>
-                             </div>
-                         </div>
-                         <div className="text-right">
-                             <span className="bg-blue-50/80 backdrop-blur-sm text-blue-600 px-3 py-1.5 rounded-lg font-bold text-xs uppercase tracking-wider">
-                                 {weatherData?.temp > 28 ? 'Sunny' : 'Clear'}
-                             </span>
-                         </div>
-                     </div>
-                ) : (
-                     <div className="card bg-white p-6 border-border flex flex-col items-center text-center gap-3 shadow-sm">
-                         <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                             <Compass size={28} />
-                         </div>
-                         <div>
-                             <h3 className="font-black text-text-primary text-lg">Local Insights</h3>
-                             <p className="text-sm text-text-secondary mt-1 max-w-[250px] mx-auto">Allow location access for real-time weather and alerts.</p>
-                         </div>
-                         <button onClick={enableLocation} className="btn bg-blue-600 hover:bg-blue-700 text-white w-full max-w-[200px] py-3 rounded-xl font-bold mt-2">Enable Location</button>
-                     </div>
-                )}
-
-                 {/* Flat Quick Actions */}
-                 <section className="grid grid-cols-2 gap-4">
-                     <button onClick={() => navigate('/resident/reports')} className="card p-5 flex flex-col items-center justify-center gap-3 bg-white hover:bg-gray-50 border-border transition-colors">
-                         <div className="h-12 w-12 bg-sky-50 rounded-xl flex items-center justify-center">
-                             <FileText size={24} className="text-sky-600" />
-                         </div>
-                         <span className="font-bold text-sm text-text-primary">Report Issue</span>
-                     </button>
-                     <button onClick={() => navigate('/resident/services')} className="card p-5 flex flex-col items-center justify-center gap-3 bg-white hover:bg-gray-50 border-border transition-colors">
-                         <div className="h-12 w-12 bg-indigo-50 rounded-xl flex items-center justify-center">
-                             <Briefcase size={24} className="text-indigo-600" />
-                         </div>
-                         <span className="font-bold text-sm text-text-primary">Get Service</span>
-                     </button>
-                 </section>
-
-                {/* Community Board (Glassmorphic Cards) */}
+                {/* Announcements Banner */}
                 <section>
-                    <div className="flex justify-between items-end mb-4 px-1">
-                        <h3 className="font-extrabold text-lg text-text-primary">Community Board</h3>
-                        <span className="text-xs font-bold text-accent uppercase tracking-widest">Live Updates</span>
-                    </div>
-                    <div className="flex gap-4 overflow-x-auto pb-6 pt-1 px-1 snap-x hide-scrollbar -mx-6 px-6">
+                    <SectionHeader title="Announcements" className="mb-3" action={<button className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Top to view all</button>} />
+                    <div className="flex gap-4 overflow-x-auto pb-4 pt-1 snap-x hide-scrollbar -mx-5 px-5">
                         {loadingData ? (
-                            [1, 2].map(i => (
-                                <div key={i} className="card min-w-[280px] p-5 bg-white border-transparent shadow-[0_8px_30px_rgb(0,0,0,0.04)] snap-start">
-                                    <div className="h-4 bg-gray-200 rounded w-1/3 mb-4 animate-pulse"></div>
-                                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
-                                </div>
-                            ))
+                            <Card className="min-w-[280px] p-5 snap-start">
+                                <div className="h-4 bg-gray-200 rounded w-1/3 mb-4 animate-pulse"></div>
+                                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                                <div className="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                            </Card>
                         ) : announcements.length === 0 ? (
-                            <div className="w-full card p-6 bg-gray-50/50 border-dashed text-center">
-                                <p className="text-xs font-bold text-text-muted uppercase tracking-wider">All caught up!</p>
-                            </div>
+                            <Card className="w-full p-6 bg-slate-50 border-dashed text-center">
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">No new announcements</p>
+                            </Card>
                         ) : (
                             announcements.map((ann) => (
-                                <div key={ann.id} className="card min-w-[280px] p-5 bg-white border-transparent shadow-[0_8px_30px_rgb(0,0,0,0.04)] snap-start group hover:-translate-y-1 transition-transform duration-300 relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-accent/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2"></div>
-                                    <div className="flex justify-between items-center mb-3">
-                                        <span className="badge bg-accent text-white border-0 text-[10px] px-2.5 py-1 font-bold shadow-sm shadow-accent/30">{ann.type || 'Update'}</span>
-                                        <span className="text-[10px] font-bold text-text-muted">{new Date(ann.created_at).toLocaleDateString()}</span>
+                                <Card key={ann.id} className="min-w-[300px] p-5 snap-start relative overflow-hidden bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className="font-bold text-slate-900 text-sm line-clamp-2 pr-6">{ann.title}</h4>
+                                        <div className="absolute top-4 right-4 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 opacity-50">
+                                            <Bell size={14} />
+                                        </div>
                                     </div>
-                                    <h4 className="font-extrabold text-text-primary text-base mb-1.5 line-clamp-1">{ann.title}</h4>
-                                    <p className="text-sm text-text-secondary line-clamp-2 leading-relaxed">{ann.content}</p>
-                                </div>
+                                    <p className="text-[11px] font-medium text-slate-600 line-clamp-2 leading-relaxed mb-3">{ann.content}</p>
+                                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-blue-600">
+                                        <span>View Details</span>
+                                        <ChevronRight size={12} />
+                                    </div>
+                                </Card>
                             ))
                         )}
                     </div>
                 </section>
 
-                {/* Sleek Activity Timeline */}
-                <section className="px-1">
-                    <h3 className="font-extrabold text-lg text-text-primary mb-4">My History</h3>
-                    <div className="space-y-5 relative">
+                {/* Quick Actions (4 icon grid) */}
+                <section>
+                    <SectionHeader title="Quick Actions" className="mb-3" />
+                    <div className="grid grid-cols-4 gap-3">
+                        <button onClick={() => navigate('/resident/reports')} className="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+                            <div className="w-[60px] h-[60px] rounded-[18px] bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-600 group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
+                                <AlertTriangle size={24} strokeWidth={1.5} />
+                            </div>
+                            <span className="text-[10px] font-semibold text-center text-slate-600 leading-tight">Report an<br/>Issue</span>
+                        </button>
+                        <button onClick={() => navigate('/resident/services')} className="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+                            <div className="w-[60px] h-[60px] rounded-[18px] bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-600 group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
+                                <FileText size={24} strokeWidth={1.5} />
+                            </div>
+                            <span className="text-[10px] font-semibold text-center text-slate-600 leading-tight">Request<br/>Document</span>
+                        </button>
+                        <button onClick={() => navigate('/resident/sos')} className="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+                            <div className="w-[60px] h-[60px] rounded-[18px] bg-red-50 border border-red-100 shadow-sm flex items-center justify-center text-red-500 group-hover:bg-red-100 transition-colors relative">
+                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                                <HeartPulse size={24} strokeWidth={1.5} />
+                            </div>
+                            <span className="text-[10px] font-semibold text-center text-red-600 leading-tight">Emergency<br/>SOS</span>
+                        </button>
+                        <button onClick={() => navigate('/resident/services')} className="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
+                            <div className="w-[60px] h-[60px] rounded-[18px] bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-600 group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
+                                <Briefcase size={24} strokeWidth={1.5} />
+                            </div>
+                            <span className="text-[10px] font-semibold text-center text-slate-600 leading-tight">Barangay<br/>Services</span>
+                        </button>
+                    </div>
+                </section>
+
+                {/* Nearby Services */}
+                <section>
+                    <SectionHeader title="Nearby Services" className="mb-3" action={<button className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">View All</button>} />
+                    <div className="space-y-3">
+                        <Card className="p-4 flex items-center gap-4 hover:border-blue-100">
+                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                                <Briefcase size={20} strokeWidth={1.5} />
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="font-bold text-sm text-slate-900">Health Center</h4>
+                                <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mt-0.5"><MapPin size={10} /> 0.5 km away</p>
+                            </div>
+                            <ChevronRight size={16} className="text-slate-400" />
+                        </Card>
+                        <Card className="p-4 flex items-center gap-4 hover:border-blue-100">
+                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+                                <Briefcase size={20} strokeWidth={1.5} />
+                            </div>
+                            <div className="flex-1">
+                                <h4 className="font-bold text-sm text-slate-900">Day Care Center</h4>
+                                <p className="text-[11px] font-medium text-slate-500 flex items-center gap-1 mt-0.5"><MapPin size={10} /> 0.8 km away</p>
+                            </div>
+                            <ChevronRight size={16} className="text-slate-400" />
+                        </Card>
+                    </div>
+                </section>
+
+                {/* Activity Timeline */}
+                <section>
+                    <SectionHeader title="Recent Activity" className="mb-4 mt-6" />
+                    <div className="space-y-4">
                         {loadingData ? (
-                            [1, 2, 3].map(i => (
+                            [1, 2].map(i => (
                                 <div key={i} className="flex gap-4 animate-pulse">
                                     <div className="h-10 w-10 bg-gray-200 rounded-full shrink-0"></div>
                                     <div className="flex-1 py-1">
@@ -227,31 +224,24 @@ export default function ResidentDashboard() {
                                 </div>
                             ))
                         ) : recentActivity.length === 0 ? (
-                            <div className="text-center py-6 text-sm font-semibold text-text-muted">No recent requests found.</div>
+                            <div className="text-center py-6 text-sm font-semibold text-slate-500">No recent activity.</div>
                         ) : (
                             recentActivity.map((act, i) => (
-                                <div key={i} className="flex gap-4 group cursor-pointer">
-                                    {/* Timeline line */}
-                                    <div className="relative">
-                                        {i !== recentActivity.length - 1 && <div className="absolute left-1/2 top-10 bottom-[-20px] w-0.5 bg-gray-100 -translate-x-1/2 z-0"></div>}
-                                        <div className="relative z-10 p-2.5 bg-white rounded-full border border-gray-100 shadow-sm h-10 w-10 flex items-center justify-center group-hover:scale-110 group-hover:border-primary/30 transition-all">
-                                            <act.icon size={16} className={act.color} />
+                                <Card key={i} className="p-4 flex gap-4 items-start">
+                                    <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
+                                        <act.icon size={18} className={act.color} />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-bold text-[13px] text-slate-900 line-clamp-1 pr-2">{act.title}</h4>
+                                            <span className="text-[9px] font-bold text-slate-400 shrink-0">{new Date(act.created_at).toLocaleDateString()}</span>
+                                        </div>
+                                        <div className="flex items-center justify-between mt-2">
+                                            <span className="text-[11px] font-medium text-slate-500">{act.type}</span>
+                                            <StatusBadge status={act.status} />
                                         </div>
                                     </div>
-                                    
-                                    {/* Content */}
-                                    <div className="flex-1 pb-1 pt-1 bg-transparent group-hover:translate-x-1 transition-transform">
-                                        <div className="flex justify-between items-start mb-0.5">
-                                            <h4 className="font-bold text-[15px] text-text-primary">{act.title}</h4>
-                                            <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">{new Date(act.created_at).toLocaleDateString()}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] font-semibold text-text-secondary">{act.type}</span>
-                                            <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                            <span className={`text-[10px] font-black uppercase tracking-widest ${act.status === 'RESOLVED' || act.status === 'COMPLETED' ? 'text-green-500' : 'text-amber-500'}`}>{act.status}</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                </Card>
                             ))
                         )}
                     </div>

@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
-import { CheckCircle2, ChevronRight, AlertTriangle, ShieldAlert, Car, Trash2, Flame, CloudRain, Sun, Bell } from 'lucide-react';
-
+import { CheckCircle2, ChevronRight, AlertTriangle, ShieldAlert, Car, Trash2, Flame, CloudRain, Sun, Bell, MapPin, Image as ImageIcon } from 'lucide-react';
+import Header from '../../components/layout/Header';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
+import SectionHeader from '../../components/ui/SectionHeader';
 export default function Reports() {
     const [reports, setReports] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -22,14 +25,14 @@ export default function Reports() {
         setCategories(catRes.data.reports || []);
     };
 
-    const handleOneClickReportClick = (category) => {
-        setReportModal({ isOpen: true, category });
-    };
+    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [description, setDescription] = useState('');
+    const [locationInput, setLocationInput] = useState('Poblacion, Barangay San Isidro');
 
-    const confirmOneClickReport = async () => {
-        const cat = reportModal.category;
-        setReportModal({ isOpen: false, category: null });
-        setLoadingId(cat.id);
+    const submitReport = async () => {
+        if (!selectedCategory) return alert("Please select an issue type.");
+        
+        setLoadingId('submit');
         
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by your browser.");
@@ -41,18 +44,19 @@ export default function Reports() {
             async (position) => {
                 try {
                     const data = {
-                        category_id: cat.id,
-                        title: `Mobile Report: ${cat.name}`,
-                        description: '1-Click report submitted from mobile app.',
-                        address: 'Location pinned via GPS',
+                        category_id: selectedCategory.id,
+                        title: `Report: ${selectedCategory.name}`,
+                        description: description || 'No details provided.',
+                        address: locationInput,
                         latitude: position.coords.latitude,
                         longitude: position.coords.longitude
                     };
                     await api.post('/reports', data);
                     await loadData();
                     setActiveTab('history');
-                    // We can use a custom toast instead of alert later if desired
-                    alert('Report submitted successfully! Responders have been notified.');
+                    alert('Report submitted successfully!');
+                    setSelectedCategory(null);
+                    setDescription('');
                 } catch (err) {
                     alert('Failed to submit report');
                 } finally {
@@ -60,7 +64,7 @@ export default function Reports() {
                 }
             },
             () => {
-                alert('Could not get your location. Please enable location services to use 1-click reporting.');
+                alert('Could not get your location. Please enable location services.');
                 setLoadingId(null);
             },
             { enableHighAccuracy: true }
@@ -70,74 +74,116 @@ export default function Reports() {
     // Helper to map generic categories to nice icons and colors
     const getReportIcon = (name) => {
         const n = name.toLowerCase();
-        if (n.includes('crime') || n.includes('security') || n.includes('safety')) return { icon: ShieldAlert, color: 'text-red-600', bg: 'bg-red-50', hover: 'hover:border-red-200 hover:shadow-[0_8px_30px_rgb(220,38,38,0.15)]' };
-        if (n.includes('traffic') || n.includes('road')) return { icon: Car, color: 'text-amber-600', bg: 'bg-amber-50', hover: 'hover:border-amber-200 hover:shadow-[0_8px_30px_rgb(217,119,6,0.15)]' };
-        if (n.includes('waste') || n.includes('garbage')) return { icon: Trash2, color: 'text-emerald-600', bg: 'bg-emerald-50', hover: 'hover:border-emerald-200 hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)]' };
-        if (n.includes('fire')) return { icon: Flame, color: 'text-orange-600', bg: 'bg-orange-50', hover: 'hover:border-orange-200 hover:shadow-[0_8px_30px_rgb(234,88,12,0.15)]' };
-        if (n.includes('flood') || n.includes('water')) return { icon: CloudRain, color: 'text-cyan-600', bg: 'bg-cyan-50', hover: 'hover:border-cyan-200 hover:shadow-[0_8px_30px_rgb(6,182,212,0.15)]' };
-        if (n.includes('light') || n.includes('electric') || n.includes('power')) return { icon: Sun, color: 'text-yellow-600', bg: 'bg-yellow-50', hover: 'hover:border-yellow-200 hover:shadow-[0_8px_30px_rgb(234,179,8,0.15)]' };
-        if (n.includes('noise')) return { icon: Bell, color: 'text-purple-600', bg: 'bg-purple-50', hover: 'hover:border-purple-200 hover:shadow-[0_8px_30px_rgb(168,85,247,0.15)]' };
-        return { icon: AlertTriangle, color: 'text-blue-600', bg: 'bg-blue-50', hover: 'hover:border-blue-200 hover:shadow-[0_8px_30px_rgb(37,99,235,0.15)]' };
+        if (n.includes('crime') || n.includes('security') || n.includes('safety')) return { icon: ShieldAlert, color: 'text-red-600', bg: 'bg-red-50' };
+        if (n.includes('traffic') || n.includes('road')) return { icon: Car, color: 'text-amber-600', bg: 'bg-amber-50' };
+        if (n.includes('waste') || n.includes('garbage')) return { icon: Trash2, color: 'text-emerald-600', bg: 'bg-emerald-50' };
+        if (n.includes('fire')) return { icon: Flame, color: 'text-orange-600', bg: 'bg-orange-50' };
+        if (n.includes('flood') || n.includes('water')) return { icon: CloudRain, color: 'text-cyan-600', bg: 'bg-cyan-50' };
+        if (n.includes('light') || n.includes('electric') || n.includes('power')) return { icon: Sun, color: 'text-yellow-600', bg: 'bg-yellow-50' };
+        if (n.includes('noise')) return { icon: Bell, color: 'text-purple-600', bg: 'bg-purple-50' };
+        return { icon: AlertTriangle, color: 'text-blue-600', bg: 'bg-blue-50' };
     };
 
     return (
-        <div className="bg-background min-h-screen pb-32">
-            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Reports & Issues</h2>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Community Action</p>
-                </div>
-            </div>
+        <div className="bg-slate-50 min-h-screen pb-32">
+            <Header title="Report an Issue" />
             
-            <div className="max-w-lg mx-auto p-6 pt-[88px]">
+            <div className="max-w-lg mx-auto p-5">
 
             {/* Flat Toggle Tabs */}
-            <div className="flex bg-gray-100 p-1.5 rounded-2xl mb-8">
+            <div className="flex bg-slate-200/60 p-1 rounded-xl mb-6">
                 <button 
                     onClick={() => setActiveTab('reports')}
-                    className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${activeTab === 'reports' ? 'bg-white text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'}`}>
-                    1-Click Reports
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'reports' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                    New Report
                 </button>
                 <button 
                     onClick={() => setActiveTab('history')}
-                    className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all ${activeTab === 'history' ? 'bg-white text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'}`}>
-                    My History
+                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${activeTab === 'history' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}>
+                    My Reports
                 </button>
             </div>
 
             {activeTab === 'reports' ? (
-                <div>
-                    <h3 className="text-xs font-bold text-text-muted uppercase tracking-wider mb-4 ml-2">What do you want to report?</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        {categories.map(cat => {
-                            const style = getReportIcon(cat.name);
-                            const Icon = style.icon;
-                            const isProcessing = loadingId === cat.id;
-                            
-                            return (
-                                <button 
-                                    key={cat.id} 
-                                    disabled={isProcessing}
-                                    onClick={() => handleOneClickReportClick(cat)}
-                                    className={`card bg-white/80 backdrop-blur-md p-5 border border-white/50 ${style.hover} flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-[0.98] ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
-                                >
-                                    <div className={`h-14 w-14 rounded-[1.25rem] flex items-center justify-center ${style.bg} shrink-0`}>
-                                        {isProcessing ? (
-                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-current text-gray-500"></div>
-                                        ) : (
-                                            <Icon size={28} className={style.color} strokeWidth={2.2} />
-                                        )}
-                                    </div>
-                                    <span className="font-bold text-[13px] text-text-primary leading-tight">{cat.name}</span>
-                                </button>
-                            );
-                        })}
+                <div className="space-y-6">
+                    {/* Issue Type Selection */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 mb-3">Issue Type</h3>
+                        <div className="flex gap-3 overflow-x-auto pb-2 snap-x hide-scrollbar">
+                            {categories.map(cat => {
+                                const style = getReportIcon(cat.name);
+                                const Icon = style.icon;
+                                const isSelected = selectedCategory?.id === cat.id;
+                                
+                                return (
+                                    <button 
+                                        key={cat.id} 
+                                        onClick={() => setSelectedCategory(cat)}
+                                        className={`snap-start shrink-0 w-[80px] h-[90px] rounded-[18px] bg-white border ${isSelected ? 'border-blue-500 shadow-sm' : 'border-slate-100'} flex flex-col items-center justify-center text-center gap-2 transition-all active:scale-95`}
+                                    >
+                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center ${isSelected ? 'bg-blue-600 text-white' : style.bg + ' ' + style.color}`}>
+                                            <Icon size={20} strokeWidth={isSelected ? 2.5 : 2} />
+                                        </div>
+                                        <span className={`font-semibold text-[10px] leading-tight ${isSelected ? 'text-blue-700' : 'text-slate-600'}`}>{cat.name}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
-                    <div className="mt-8 p-4 bg-blue-50 rounded-2xl border border-blue-100 text-center">
-                        <p className="text-xs text-blue-800 font-semibold">
-                            Tapping a category will securely submit a report with your current GPS location to the barangay dispatch center immediately.
-                        </p>
+
+                    {/* Location */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 mb-3">Location</h3>
+                        <div className="relative mb-3">
+                            <input type="text" value={locationInput} onChange={(e) => setLocationInput(e.target.value)} className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-4 pr-10 text-sm text-slate-900 focus:outline-none focus:border-blue-500 font-medium shadow-sm" placeholder="Search location..." />
+                            <MapPin size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                        </div>
+                        <div className="w-full h-32 bg-slate-200 rounded-2xl overflow-hidden relative border border-slate-100 shadow-sm">
+                            {/* Fake map image for UI mockup purposes */}
+                            <div className="absolute inset-0 opacity-40 bg-[url('https://maps.wikimedia.org/osm-intl/13/4260/3781.png')] bg-cover bg-center"></div>
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pb-2">
+                                <div className="w-8 h-8 text-blue-600">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    {/* Details */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 mb-3">Details</h3>
+                        <textarea 
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Describe the issue..." 
+                            className="w-full h-24 bg-white border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:outline-none focus:border-blue-500 font-medium resize-none shadow-sm"
+                        ></textarea>
+                    </div>
+
+                    {/* Add Photo */}
+                    <div>
+                        <h3 className="text-sm font-bold text-slate-900 mb-3 flex justify-between">Add Photo (Optional)</h3>
+                        <div className="flex gap-3">
+                            <button className="w-20 h-20 rounded-2xl border-2 border-dashed border-blue-200 bg-blue-50 flex items-center justify-center text-blue-500 hover:bg-blue-100 transition-colors">
+                                <ImageIcon size={24} />
+                            </button>
+                            <button className="w-20 h-20 rounded-2xl border border-slate-200 bg-white flex items-center justify-center text-slate-300 hover:bg-slate-50 transition-colors">
+                                <ImageIcon size={24} />
+                            </button>
+                            <button className="w-20 h-20 rounded-2xl border border-slate-200 bg-white flex items-center justify-center text-slate-300 hover:bg-slate-50 transition-colors">
+                                <ImageIcon size={24} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <Button 
+                        onClick={submitReport} 
+                        loading={loadingId === 'submit'}
+                        className="w-full mt-4" 
+                        size="lg"
+                    >
+                        Submit Report
+                    </Button>
                 </div>
             ) : (
                 <div className="space-y-4">
@@ -169,45 +215,6 @@ export default function Reports() {
                 </div>
             )}
             </div>
-
-            {/* Bottom Sheet Confirm Modal */}
-            {reportModal.isOpen && reportModal.category && (() => {
-                const style = getReportIcon(reportModal.category.name);
-                const Icon = style.icon;
-                return (
-                    <div className="fixed inset-0 z-50 flex flex-col justify-end">
-                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setReportModal({ isOpen: false, category: null })}></div>
-                        <div className="relative bg-white w-full max-w-lg mx-auto rounded-t-[2.5rem] shadow-2xl p-6 sm:p-8 animate-in slide-in-from-bottom-full duration-300 ease-out">
-                            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
-                            <div className="flex flex-col items-center text-center mb-6">
-                                <div className={`h-20 w-20 rounded-full flex items-center justify-center ${style.bg} mb-4 shadow-sm`}>
-                                    <Icon size={36} className={style.color} strokeWidth={2} />
-                                </div>
-                                <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Report {reportModal.category.name}?</h3>
-                                <p className="text-slate-500 font-medium text-sm px-4">
-                                    This will securely pin your current GPS location and dispatch an alert to the barangay responders.
-                                </p>
-                            </div>
-                            
-                            <div className="space-y-3">
-                                <button 
-                                    onClick={confirmOneClickReport}
-                                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-red-600 text-white rounded-2xl text-sm font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:bg-red-700 active:scale-[0.98] transition-all"
-                                >
-                                    <AlertTriangle size={18} /> Confirm Report
-                                </button>
-                                <button 
-                                    onClick={() => setReportModal({ isOpen: false, category: null })}
-                                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-200 active:scale-[0.98] transition-all"
-                                >
-                                    Cancel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            })()}
-
         </div>
     );
 }

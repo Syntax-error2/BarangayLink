@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bell, CheckCircle2, AlertCircle, FileText, Briefcase, Check, Sparkles } from 'lucide-react';
 import api from '../../lib/axios';
 import { useResidentNotifications } from '../../context/ResidentNotificationContext';
+import Header from '../../components/layout/Header';
 
 export default function ResidentNotifications() {
     const navigate = useNavigate();
@@ -96,25 +97,22 @@ export default function ResidentNotifications() {
     });
 
     return (
-        <div className="bg-background min-h-screen pb-32">
-            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Notifications</h2>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">
-                        {unreadCount} unread
-                    </p>
-                </div>
-                {unreadCount > 0 && (
-                    <button 
-                        onClick={markAllAsRead}
-                        className="text-[10px] font-bold text-primary hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
-                    >
-                        <Check size={14} /> Mark all read
-                    </button>
-                )}
-            </div>
+        <div className="bg-slate-50 min-h-screen pb-32">
+            <Header 
+                title="Notifications" 
+                rightAction={
+                    unreadCount > 0 && (
+                        <button 
+                            onClick={markAllAsRead}
+                            className="text-[10px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
+                        >
+                            <Check size={14} /> Mark all read
+                        </button>
+                    )
+                }
+            />
 
-            <div className="max-w-lg mx-auto p-6 pt-[88px]">
+            <div className="max-w-lg mx-auto p-5">
                 
                 {/* Horizontal Scrollable Tabs */}
                 <div className="flex gap-2 overflow-x-auto pb-4 mb-2 snap-x hide-scrollbar -mx-6 px-6">

@@ -142,7 +142,7 @@ export default function Chatbot() {
     return (
         <div className="max-w-lg mx-auto flex flex-col min-h-screen bg-slate-50 pb-32">
             {/* Header */}
-            <div className="fixed top-16 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 z-30">
+            <div className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 z-30">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </button>
@@ -193,8 +193,8 @@ export default function Chatbot() {
             </div>
 
             {/* Input Area */}
-            <div className="fixed bottom-[95px] left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-200/60 p-4 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                <div className="flex gap-2 bg-slate-100 p-1.5 rounded-full border border-slate-200/50">
+            <div className="fixed bottom-[110px] left-0 w-full bg-slate-50/95 backdrop-blur-xl p-4 z-40">
+                <div className="flex gap-2 bg-white p-1.5 rounded-full border border-slate-200/60 shadow-sm">
                     <input 
                         type="text" 
                         value={input}
