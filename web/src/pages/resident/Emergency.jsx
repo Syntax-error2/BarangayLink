@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Sparkles, Send, Bot, User as UserIcon } from 'lucide-react';
+import { Sparkles, Send, Bot, User as UserIcon, ChevronLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/axios';
 
@@ -144,7 +144,7 @@ export default function Chatbot() {
             {/* Header */}
             <div className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 z-30">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    <ChevronLeft size={24} />
                 </button>
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-sm shrink-0">
                     <Sparkles size={20} />
