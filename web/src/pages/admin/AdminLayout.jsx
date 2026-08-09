@@ -41,7 +41,7 @@ export default function AdminLayout() {
         {
             title: 'COMMUNICATION',
             items: [
-                { path: '/admin/messages', icon: MessageSquare, label: 'Messages', badge: 5 }, // Example static badge for mockup
+                { path: '/admin/messages', icon: MessageSquare, label: 'Messages' },
                 { path: '/admin/broadcast', icon: Radio, label: 'Broadcast' },
             ]
         },
