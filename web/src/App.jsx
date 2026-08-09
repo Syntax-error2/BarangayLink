@@ -23,10 +23,14 @@ import { ResidentNotificationProvider } from './context/ResidentNotificationCont
 import ResidentNotifications from './pages/resident/Notifications';
 import Onboarding from './pages/auth/Onboarding';
 
+const isApp = () => {
+    return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || !!window.Capacitor;
+};
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
     const { user, loading } = useAuth();
     if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
-    if (!user) return <Navigate to="/onboarding" />;
+    if (!user) return <Navigate to={isApp() ? "/onboarding" : "/login"} />;
     if (allowedRoles && !allowedRoles.includes(user.role.slug)) return <Navigate to="/" />;
     return children;
 };
@@ -34,7 +38,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 const RootRedirect = () => {
     const { user, loading } = useAuth();
     if (loading) return null;
-    if (!user) return <Navigate to="/onboarding" />;
+    if (!user) return <Navigate to={isApp() ? "/onboarding" : "/login"} />;
     return user.role.slug === 'resident' ? <Navigate to="/resident" /> : <Navigate to="/admin" />;
 };
 

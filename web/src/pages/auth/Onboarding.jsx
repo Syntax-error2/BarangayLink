@@ -5,6 +5,7 @@ import { Shield, Users, Building, ArrowRight } from 'lucide-react';
 export default function Onboarding() {
     const navigate = useNavigate();
     const [step, setStep] = useState(0); // 0 = Splash, 1 = Onboarding
+    const [slide, setSlide] = useState(0); // 0 to 2 for onboarding slides
 
     useEffect(() => {
         // Show splash screen for 2.5 seconds, then go to onboarding
@@ -17,8 +18,15 @@ export default function Onboarding() {
     }, [step]);
 
     const handleSkip = () => {
-        // Navigate to login
         navigate('/login');
+    };
+
+    const handleNext = () => {
+        if (slide < 2) {
+            setSlide(slide + 1);
+        } else {
+            handleSkip();
+        }
     };
 
     if (step === 0) {
@@ -48,45 +56,68 @@ export default function Onboarding() {
         );
     }
 
-    // Onboarding Screen
+    const slides = [
+        {
+            icon: <Building size={100} className="text-blue-600 opacity-80" strokeWidth={1} />,
+            badge: <Users size={40} className="text-indigo-500 absolute bottom-12 right-12" />,
+            title: <>Your Barangay,<br/>In Your Hands</>,
+            desc: "Connect with your barangay officials, report issues, and access services quickly."
+        },
+        {
+            icon: <Shield size={100} className="text-blue-600 opacity-80" strokeWidth={1} />,
+            badge: <ArrowRight size={40} className="text-teal-500 absolute bottom-12 right-12" />,
+            title: <>Report Issues<br/>Easily</>,
+            desc: "Send emergency alerts and file incident reports directly to your local officials."
+        },
+        {
+            icon: <Users size={100} className="text-blue-600 opacity-80" strokeWidth={1} />,
+            badge: <Building size={40} className="text-orange-500 absolute bottom-12 right-12" />,
+            title: <>Access Services<br/>Instantly</>,
+            desc: "Request barangay certificates, clearances, and view announcements on the go."
+        }
+    ];
+
     return (
-        <div className="min-h-screen bg-white flex flex-col pt-12 pb-8 px-6 animate-in slide-in-from-right duration-500">
-            <div className="flex justify-end mb-8">
-                <button onClick={handleSkip} className="text-blue-600 font-bold text-sm tracking-wide">
+        <div className="min-h-screen bg-white flex flex-col pt-12 pb-8 px-6 animate-in slide-in-from-right duration-500 relative">
+            <div className="flex justify-end mb-8 z-10">
+                <button onClick={handleSkip} className="text-blue-600 font-bold text-sm tracking-wide py-2 px-4">
                     Skip
                 </button>
             </div>
             
-            <div className="flex-1 flex flex-col items-center justify-center">
-                {/* Placeholder for illustration */}
-                <div className="w-full max-w-[280px] aspect-square bg-slate-50 rounded-full mb-10 flex items-center justify-center shadow-inner border border-slate-100 relative">
+            <div className="flex-1 flex flex-col items-center justify-center -mt-8">
+                {/* Illustration Area */}
+                <div className="w-full max-w-[280px] aspect-square bg-slate-50 rounded-full mb-10 flex items-center justify-center shadow-inner border border-slate-100 relative transition-all duration-500 ease-in-out">
                     <div className="absolute inset-0 bg-blue-100 rounded-full opacity-20 blur-xl scale-110"></div>
-                    <Building size={100} className="text-blue-600 opacity-80" strokeWidth={1} />
-                    <Users size={40} className="text-indigo-500 absolute bottom-12 right-12" />
+                    {slides[slide].icon}
+                    {slides[slide].badge}
                 </div>
                 
-                <div className="text-center space-y-4">
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
-                        Your Barangay,<br/>In Your Hands
+                <div className="text-center space-y-4 px-4">
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-tight transition-all duration-300">
+                        {slides[slide].title}
                     </h2>
-                    <p className="text-slate-500 font-medium text-[15px] leading-relaxed max-w-[280px] mx-auto">
-                        Connect with your barangay officials, report issues, and access services quickly.
+                    <p className="text-slate-500 font-medium text-[15px] leading-relaxed max-w-[280px] mx-auto transition-all duration-300">
+                        {slides[slide].desc}
                     </p>
                 </div>
             </div>
             
             <div className="mt-auto pt-8">
                 <div className="flex justify-center gap-2 mb-8">
-                    <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+                    {[0, 1, 2].map((i) => (
+                        <div 
+                            key={i} 
+                            className={`h-2.5 rounded-full transition-all duration-300 ${slide === i ? 'w-8 bg-blue-600' : 'w-2.5 bg-slate-200'}`}
+                        ></div>
+                    ))}
                 </div>
                 
                 <button 
-                    onClick={handleSkip}
+                    onClick={handleNext}
                     className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-[0_8px_30px_rgb(37,99,235,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
-                    Next
+                    {slide === 2 ? "Get Started" : "Next"}
                 </button>
             </div>
         </div>

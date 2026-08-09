@@ -25,19 +25,22 @@ class SettingsController extends Controller
                 return response()->json(['message' => 'No barangay associated with user'], 404);
             }
 
-            // Delete old logo if exists
-            if ($barangay->logo_path) {
+            // Delete old logo if exists (if it was a file)
+            if ($barangay->logo_path && str_starts_with($barangay->logo_path, 'storage/')) {
                 Storage::disk('public')->delete(str_replace('storage/', '', $barangay->logo_path));
             }
 
-            $path = $request->file('logo')->store('logos', 'public');
+            $file = $request->file('logo');
+            $base64 = base64_encode(file_get_contents($file->getRealPath()));
+            $mime = $file->getMimeType();
+            $dataUri = 'data:' . $mime . ';base64,' . $base64;
             
-            $barangay->logo_path = 'storage/' . $path;
+            $barangay->logo_path = $dataUri;
             $barangay->save();
 
             return response()->json([
                 'message' => 'Logo uploaded successfully',
-                'logo_path' => url($barangay->logo_path),
+                'logo_path' => $barangay->logo_path,
                 'barangay' => $barangay
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
