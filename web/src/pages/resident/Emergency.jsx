@@ -140,7 +140,7 @@ export default function Chatbot() {
     };
 
     return (
-        <div className="max-w-lg mx-auto flex flex-col min-h-screen bg-slate-50 pb-32">
+        <div className="max-w-lg mx-auto flex flex-col min-h-screen bg-slate-50">
             {/* Header */}
             <div className="fixed top-0 left-0 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/60 shadow-sm px-5 py-4 flex items-center gap-3 z-30">
                 <button onClick={() => navigate(-1)} className="p-2 -ml-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
@@ -193,7 +193,7 @@ export default function Chatbot() {
             </div>
 
             {/* Input Area */}
-            <div className="fixed bottom-[110px] left-0 w-full bg-slate-50/95 backdrop-blur-xl p-4 z-40">
+            <div className="fixed bottom-0 left-0 w-full bg-slate-50/95 backdrop-blur-xl p-4 z-40 pb-[env(safe-area-inset-bottom,1rem)]">
                 <div className="flex gap-2 bg-white p-1.5 rounded-full border border-slate-200/60 shadow-sm">
                     <input 
                         type="text" 

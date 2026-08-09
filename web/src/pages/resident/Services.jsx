@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
 import { Briefcase, CheckCircle2, ChevronRight, FileText, ClipboardList, Shield, Home, Building, X, Send } from 'lucide-react';
+import Header from '../../components/layout/Header';
 
 export default function Services() {
     const [requests, setRequests] = useState([]);
@@ -50,15 +51,10 @@ export default function Services() {
     };
 
     return (
-        <div className="bg-background min-h-screen pb-32 relative">
-            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
-                <div>
-                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Services</h2>
-                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Barangay Hall</p>
-                </div>
-            </div>
+        <div className="bg-slate-50 min-h-screen pb-32 relative">
+            <Header title="Services" />
             
-            <div className="max-w-lg mx-auto p-6 pt-[88px]">
+            <div className="max-w-lg mx-auto p-5">
 
             <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
                 <button 

@@ -10,7 +10,7 @@ export default function ResidentLayout() {
     const { unreadCount } = useResidentNotifications();
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-20 pt-20">
+        <div className="min-h-screen bg-slate-50 font-sans pb-20">
             {/* Top Header removed in favor of page-specific headers */}
 
             <Outlet />

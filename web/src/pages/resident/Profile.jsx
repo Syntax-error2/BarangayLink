@@ -144,9 +144,9 @@ export default function Profile() {
                 </div>
 
                 {isEditing && (
-                    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+                    <div className="fixed inset-0 z-40 flex flex-col justify-end">
                         <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsEditing(false)}></div>
-                        <div className="relative bg-white w-full max-w-lg mx-auto rounded-t-[30px] p-6 pb-12 animate-in slide-in-from-bottom-full duration-300">
+                        <div className="relative bg-white w-full max-w-lg mx-auto rounded-t-[30px] p-6 pb-32 animate-in slide-in-from-bottom-full duration-300">
                             <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
                             <h3 className="text-xl font-bold text-slate-900 mb-6">Edit Profile</h3>
                             
