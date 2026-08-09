@@ -1,33 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-    Calendar as CalendarIcon, Plus, MoreVertical, 
-    MapPin, Clock, Users, Edit, Trash2
+    Calendar as CalendarIcon, Search, Plus, MapPin, 
+    Clock, Users, MoreVertical, Edit, Trash2
 } from 'lucide-react';
+import api from '../../lib/axios';
 
 export default function Events() {
-    const mockEvents = [
-        { id: 1, title: 'Barangay Assembly Meeting', date: '2026-08-15', time: '09:00 AM - 12:00 PM', location: 'Barangay Covered Court', attendees: 150, status: 'Upcoming', type: 'Assembly' },
-        { id: 2, title: 'Medical Mission & Vaccination', date: '2026-08-20', time: '08:00 AM - 05:00 PM', location: 'Health Center', attendees: 300, status: 'Upcoming', type: 'Health' },
-        { id: 3, title: 'Youth Basketball League Finals', date: '2026-08-25', time: '04:00 PM - 07:00 PM', location: 'Barangay Covered Court', attendees: 500, status: 'Upcoming', type: 'Sports' },
-        { id: 4, title: 'Coastal Clean-up Drive', date: '2026-08-01', time: '06:00 AM - 09:00 AM', location: 'Purok 5 Shoreline', attendees: 85, status: 'Completed', type: 'Environment' },
-        { id: 5, title: 'Senior Citizens Benefit Payout', date: '2026-08-10', time: '08:00 AM - 03:00 PM', location: 'Barangay Hall', attendees: 200, status: 'Completed', type: 'Social Service' },
-    ];
+    const [search, setSearch] = useState('');
+    const [events, setEvents] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const getStatusColor = (status) => {
-        if (status === 'Upcoming') return 'bg-blue-100 text-blue-700';
-        if (status === 'Ongoing') return 'bg-emerald-100 text-emerald-700';
-        return 'bg-slate-100 text-slate-600';
+    useEffect(() => {
+        fetchEvents();
+    }, []);
+
+    const fetchEvents = async () => {
+        try {
+            const response = await api.get('/events');
+            setEvents(response.data);
+        } catch (error) {
+            console.error('Failed to fetch events:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const getTypeColor = (type) => {
-        switch(type) {
-            case 'Assembly': return 'bg-purple-50 text-purple-700 border-purple-200';
-            case 'Health': return 'bg-rose-50 text-rose-700 border-rose-200';
-            case 'Sports': return 'bg-orange-50 text-orange-700 border-orange-200';
-            case 'Environment': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-            case 'Social Service': return 'bg-amber-50 text-amber-700 border-amber-200';
-            default: return 'bg-slate-50 text-slate-700 border-slate-200';
-        }
+    const filteredEvents = events.filter(e => {
+        const matchesSearch = e.title.toLowerCase().includes(search.toLowerCase());
+        return matchesSearch;
+    });
+
+    const getStatusBadge = (dateStr) => {
+        const today = new Date();
+        const eventDate = new Date(dateStr);
+        if (eventDate < today) return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-100 text-slate-600">Past</span>;
+        const diffDays = Math.ceil((eventDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 2) return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-red-50 text-red-700">Soon</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-blue-50 text-blue-700">Upcoming</span>;
     };
 
     return (
@@ -37,21 +46,41 @@ export default function Events() {
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
                         <CalendarIcon className="text-blue-600" />
-                        Events & Activities
+                        Community Events
                     </h1>
-                    <p className="text-sm text-slate-500 mt-1">Schedule and manage barangay events, meetings, and programs.</p>
+                    <p className="text-sm text-slate-500 mt-1">Manage barangay activities, assemblies, and programs.</p>
                 </div>
                 <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm">
                     <Plus size={18} />
-                    Create New Event
+                    Create Event
                 </button>
             </div>
 
             {/* List */}
             <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex-1 flex flex-col">
+                <div className="p-4 border-b border-slate-100 flex items-center">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <input 
+                            type="text" 
+                            placeholder="Search events..." 
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-blue-500 transition-all"
+                        />
+                    </div>
+                </div>
                 <div className="overflow-x-auto flex-1 custom-scrollbar p-6 space-y-4">
-                    {mockEvents.map(event => {
-                        const dateObj = new Date(event.date);
+                    {loading ? (
+                        <div className="flex justify-center items-center h-40"><p className="text-slate-500">Loading events...</p></div>
+                    ) : filteredEvents.length === 0 ? (
+                        <div className="bg-white rounded-2xl border border-slate-100 p-12 text-center shadow-sm">
+                            <CalendarIcon size={48} className="mx-auto text-slate-300 mb-4" />
+                            <h3 className="text-lg font-bold text-slate-900 mb-1">No events found</h3>
+                            <p className="text-slate-500 text-sm">Create a new event to keep the community updated.</p>
+                        </div>
+                    ) : filteredEvents.map(event => {
+                        const dateObj = new Date(event.start_date);
                         return (
                             <div key={event.id} className="flex flex-col md:flex-row gap-6 p-5 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-md transition-all group bg-white">
                                 {/* Date Block */}
@@ -64,27 +93,18 @@ export default function Events() {
                                 {/* Info */}
                                 <div className="flex-1 flex flex-col justify-center min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${getTypeColor(event.type)}`}>
-                                            {event.type}
-                                        </span>
-                                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${getStatusColor(event.status)}`}>
-                                            {event.status}
-                                        </span>
+                                        {getStatusBadge(event.start_date)}
                                     </div>
                                     <h2 className="text-lg font-bold text-slate-900 truncate mb-2 group-hover:text-blue-700 transition-colors">{event.title}</h2>
                                     
                                     <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
                                         <div className="flex items-center gap-1.5">
                                             <Clock size={14} className="text-slate-400" />
-                                            {event.time}
+                                            {dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </div>
                                         <div className="flex items-center gap-1.5">
                                             <MapPin size={14} className="text-slate-400" />
                                             <span className="truncate max-w-[200px]">{event.location}</span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5">
-                                            <Users size={14} className="text-slate-400" />
-                                            {event.attendees} expected
                                         </div>
                                     </div>
                                 </div>

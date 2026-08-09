@@ -1,26 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
-    Users, Search, Filter, Plus, MoreVertical, 
+    Users, Search, Filter, MoreVertical, 
     UserCheck, UserX, Download, MapPin, Phone, Mail
 } from 'lucide-react';
+import api from '../../lib/axios';
 
 export default function Residents() {
     const [search, setSearch] = useState('');
     const [filterPurok, setFilterPurok] = useState('All Puroks');
+    const [residents, setResidents] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Mock Data for UI presentation
-    const mockResidents = [
-        { id: 1, first_name: 'Juan', last_name: 'Dela Cruz', purok: 'Purok 1', phone: '09123456789', status: 'verified', avatar: null, email: 'juan@example.com' },
-        { id: 2, first_name: 'Maria', last_name: 'Santos', purok: 'Purok 2', phone: '09198765432', status: 'verified', avatar: null, email: 'maria@example.com' },
-        { id: 3, first_name: 'Pedro', last_name: 'Penduko', purok: 'Purok 1', phone: '09456789123', status: 'pending', avatar: null, email: 'pedro@example.com' },
-        { id: 4, first_name: 'Ana', last_name: 'Rizal', purok: 'Purok 3', phone: '09334455667', status: 'verified', avatar: null, email: 'ana@example.com' },
-        { id: 5, first_name: 'Andres', last_name: 'Bonifacio', purok: 'Purok 4', phone: '09778899001', status: 'suspended', avatar: null, email: 'andres@example.com' },
-        { id: 6, first_name: 'Gabriela', last_name: 'Silang', purok: 'Purok 2', phone: '09991112233', status: 'verified', avatar: null, email: 'gab@example.com' },
-    ];
+    useEffect(() => {
+        fetchResidents();
+    }, []);
+
+    const fetchResidents = async () => {
+        try {
+            const response = await api.get('/users/residents');
+            setResidents(response.data);
+        } catch (error) {
+            console.error('Failed to fetch residents:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const puroks = ['All Puroks', 'Purok 1', 'Purok 2', 'Purok 3', 'Purok 4', 'Purok 5'];
 
-    const filteredResidents = mockResidents.filter(r => {
+    const filteredResidents = residents.filter(r => {
         const matchesSearch = (r.first_name + ' ' + r.last_name).toLowerCase().includes(search.toLowerCase());
         const matchesPurok = filterPurok === 'All Puroks' || r.purok === filterPurok;
         return matchesSearch && matchesPurok;
@@ -50,10 +58,6 @@ export default function Residents() {
                     <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm">
                         <Download size={18} />
                         Export
-                    </button>
-                    <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm">
-                        <Plus size={18} />
-                        Add Resident
                     </button>
                 </div>
             </div>

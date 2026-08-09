@@ -1,15 +1,30 @@
 import { useState } from 'react';
 import { Radio, Smartphone, BellRing, Send, AlertTriangle, Users } from 'lucide-react';
+import api from '../../lib/axios';
 
 export default function Broadcast() {
     const [message, setMessage] = useState('');
     const [channels, setChannels] = useState({ sms: true, app: true });
     const [targetAudience, setTargetAudience] = useState('all');
+    const [loading, setLoading] = useState(false);
 
-    const handleSend = (e) => {
+    const handleSend = async (e) => {
         e.preventDefault();
-        alert('Broadcast dispatched successfully!');
-        setMessage('');
+        setLoading(true);
+        try {
+            await api.post('/broadcast', {
+                message,
+                type: 'alert',
+                audience: targetAudience
+            });
+            alert('Broadcast dispatched successfully!');
+            setMessage('');
+        } catch (error) {
+            console.error('Failed to dispatch broadcast:', error);
+            alert('Failed to send broadcast.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -107,11 +122,11 @@ export default function Broadcast() {
                         </p>
                         <button 
                             type="submit" 
-                            disabled={!message.trim() || (!channels.sms && !channels.app)}
+                            disabled={loading || !message.trim() || (!channels.sms && !channels.app)}
                             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white px-8 py-3 rounded-xl font-bold text-sm transition-colors shadow-sm"
                         >
                             <Send size={18} />
-                            Dispatch Broadcast
+                            {loading ? 'Dispatching...' : 'Dispatch Broadcast'}
                         </button>
                     </div>
 

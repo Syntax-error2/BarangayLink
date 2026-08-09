@@ -44,4 +44,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/settings/logo', [\App\Http\Controllers\Api\SettingsController::class, 'uploadLogo']);
     Route::put('/settings/barangay', [\App\Http\Controllers\Api\SettingsController::class, 'updateBarangay']);
     Route::put('/settings/security', [\App\Http\Controllers\Api\SettingsController::class, 'updateSecurity']);
+
+    // New routes
+    Route::get('/users/residents', [\App\Http\Controllers\Api\UserController::class, 'getResidents']);
+    Route::get('/users/staff', [\App\Http\Controllers\Api\UserController::class, 'getStaff']);
+    Route::apiResource('events', \App\Http\Controllers\Api\EventController::class)->except(['create', 'edit', 'show', 'update']);
+    Route::get('/messages', [\App\Http\Controllers\Api\MessageController::class, 'getConversations']);
+    Route::get('/messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'getMessages']);
+    Route::post('/messages', [\App\Http\Controllers\Api\MessageController::class, 'sendMessage']);
+    Route::post('/broadcast', [\App\Http\Controllers\Api\BroadcastController::class, 'sendBroadcast']);
 });

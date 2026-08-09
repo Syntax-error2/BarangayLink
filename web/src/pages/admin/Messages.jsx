@@ -1,28 +1,72 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
     Search, MessageSquare, Send, MoreVertical, 
     Phone, Video, Info, Paperclip, Smile
 } from 'lucide-react';
+import api from '../../lib/axios';
 
 export default function Messages() {
-    const [activeChat, setActiveChat] = useState(1);
+    const [activeChat, setActiveChat] = useState(null);
     const [message, setMessage] = useState('');
+    const [chats, setChats] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const messagesEndRef = useRef(null);
 
-    const chats = [
-        { id: 1, name: 'Juan Dela Cruz', lastMessage: 'Thank you for the update on my clearance.', time: '10:42 AM', unread: 2, avatar: 'J', online: true },
-        { id: 2, name: 'Maria Santos', lastMessage: 'Is the health center open today?', time: 'Yesterday', unread: 0, avatar: 'M', online: false },
-        { id: 3, name: 'Pedro Penduko', lastMessage: 'I sent the requirements.', time: 'Yesterday', unread: 0, avatar: 'P', online: true },
-        { id: 4, name: 'Brgy Responders Group', lastMessage: 'Team A is deployed.', time: 'Tuesday', unread: 0, avatar: 'B', isGroup: true, online: true },
-        { id: 5, name: 'Ana Rizal', lastMessage: 'Noted, thank you!', time: 'Monday', unread: 0, avatar: 'A', online: false },
-    ];
+    useEffect(() => {
+        fetchConversations();
+    }, []);
 
-    const messages = [
-        { id: 1, sender: 'Juan Dela Cruz', text: 'Good morning Admin! I would like to ask about my barangay clearance request.', time: '10:30 AM', isMe: false },
-        { id: 2, sender: 'Admin', text: 'Good morning Juan. Let me check the status of your request.', time: '10:32 AM', isMe: true },
-        { id: 3, sender: 'Admin', text: 'It has been approved. You can pick it up this afternoon at the barangay hall.', time: '10:35 AM', isMe: true },
-        { id: 4, sender: 'Juan Dela Cruz', text: 'That is great news! What time is the cut-off?', time: '10:40 AM', isMe: false },
-        { id: 5, sender: 'Juan Dela Cruz', text: 'Thank you for the update on my clearance.', time: '10:42 AM', isMe: false },
-    ];
+    useEffect(() => {
+        if (activeChat) {
+            fetchMessages(activeChat);
+        }
+    }, [activeChat]);
+
+    useEffect(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
+    const fetchConversations = async () => {
+        try {
+            const response = await api.get('/messages');
+            setChats(response.data);
+            if (response.data.length > 0 && !activeChat) {
+                setActiveChat(response.data[0].id);
+            }
+        } catch (error) {
+            console.error('Failed to fetch conversations:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchMessages = async (userId) => {
+        try {
+            const response = await api.get(`/messages/${userId}`);
+            setMessages(response.data);
+            // Refresh conversations to clear unread count
+            fetchConversations();
+        } catch (error) {
+            console.error('Failed to fetch messages:', error);
+        }
+    };
+
+    const handleSendMessage = async () => {
+        if (!message.trim() || !activeChat) return;
+
+        try {
+            const response = await api.post('/messages', {
+                receiver_id: activeChat,
+                content: message
+            });
+            setMessages([...messages, response.data]);
+            setMessage('');
+            fetchConversations(); // update last message in sidebar
+        } catch (error) {
+            console.error('Failed to send message:', error);
+        }
+    };
 
     const activeUser = chats.find(c => c.id === activeChat);
 
@@ -45,7 +89,9 @@ export default function Messages() {
                     </div>
                 </div>
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-                    {chats.map(chat => (
+                    {loading ? (
+                        <p className="text-center text-slate-400 text-sm mt-4">Loading chats...</p>
+                    ) : chats.map(chat => (
                         <div 
                             key={chat.id} 
                             onClick={() => setActiveChat(chat.id)}
@@ -63,7 +109,7 @@ export default function Messages() {
                                     <span className={`text-[10px] whitespace-nowrap ${chat.unread > 0 ? 'text-blue-600 font-bold' : 'text-slate-400'}`}>{chat.time}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <p className={`text-xs truncate ${chat.unread > 0 ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>{chat.lastMessage}</p>
+                                    <p className={`text-xs truncate ${chat.unread > 0 ? 'text-slate-900 font-semibold' : 'text-slate-500'}`}>{chat.lastMessage || 'Start a conversation'}</p>
                                     {chat.unread > 0 && (
                                         <span className="bg-blue-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full shrink-0">
                                             {chat.unread}
@@ -104,10 +150,9 @@ export default function Messages() {
 
                         {/* Messages */}
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4 bg-slate-50/50">
-                            <div className="text-center mb-6">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-100 px-3 py-1 rounded-full">Today</span>
-                            </div>
-                            {messages.map(msg => (
+                            {messages.length === 0 ? (
+                                <p className="text-center text-slate-400 text-sm mt-4">No messages yet. Send a message to start.</p>
+                            ) : messages.map(msg => (
                                 <div key={msg.id} className={`flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
                                     <div className="flex items-end gap-2 max-w-[70%]">
                                         {!msg.isMe && (
@@ -122,6 +167,7 @@ export default function Messages() {
                                     <span className="text-[10px] text-slate-400 mt-1 mx-8">{msg.time}</span>
                                 </div>
                             ))}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         {/* Input Area */}
@@ -136,6 +182,7 @@ export default function Messages() {
                                         placeholder="Type your message..."
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-4 pr-10 text-sm focus:outline-none focus:border-blue-500 transition-colors"
                                     />
                                     <button className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -143,6 +190,7 @@ export default function Messages() {
                                     </button>
                                 </div>
                                 <button 
+                                    onClick={handleSendMessage}
                                     className={`p-3 rounded-xl transition-colors ${message.trim() ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
                                 >
                                     <Send size={20} className={message.trim() ? 'ml-1' : ''} />

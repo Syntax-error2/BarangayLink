@@ -4,7 +4,7 @@ import api, { getImageUrl } from '../../lib/axios';
 import { 
     FileText, Briefcase, Users, Bell, TrendingUp, AlertTriangle,
     CheckCircle2, Plus, ArrowRight, Megaphone, Calendar, UserPlus,
-    Activity, Clock, MapPin, Search
+    Activity, Clock, MapPin, Search, MessageSquare
 } from 'lucide-react';
 import { 
     AreaChart, Area, PieChart, Pie, Cell, XAxis, YAxis, 
@@ -342,9 +342,9 @@ export default function AdminDashboard() {
                                 <Calendar size={24} className="mb-2 group-hover:scale-110 transition-transform" />
                                 <span className="text-xs font-bold">Add Event</span>
                             </Link>
-                            <Link to="/admin/residents" className="flex flex-col items-center justify-center p-4 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl transition-colors text-center group">
-                                <UserPlus size={24} className="mb-2 group-hover:scale-110 transition-transform" />
-                                <span className="text-xs font-bold">Add Resident</span>
+                            <Link to="/admin/messages" className="flex flex-col items-center justify-center p-4 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl transition-colors text-center group">
+                                <MessageSquare size={24} className="mb-2 group-hover:scale-110 transition-transform" />
+                                <span className="text-xs font-bold">Messages</span>
                             </Link>
                         </div>
                     </div>

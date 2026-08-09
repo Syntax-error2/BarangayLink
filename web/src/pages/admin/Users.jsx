@@ -1,21 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     ShieldCheck, Search, Plus, MoreVertical, 
     Edit, Trash2, Mail, BadgeCheck, UserCog
 } from 'lucide-react';
+import api from '../../lib/axios';
 
 export default function Users() {
     const [search, setSearch] = useState('');
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    const mockUsers = [
-        { id: 1, name: 'Admin Dave', role: 'Super Admin', email: 'dave@barangaylink.com', status: 'active', last_login: '2 mins ago' },
-        { id: 2, name: 'Barangay Captain', role: 'Barangay Admin', email: 'captain@barangaylink.com', status: 'active', last_login: '1 hour ago' },
-        { id: 3, name: 'John Staff', role: 'Staff', email: 'staff1@barangaylink.com', status: 'active', last_login: '3 hours ago' },
-        { id: 4, name: 'Emergency Team', role: 'Responder', email: 'rescue@barangaylink.com', status: 'offline', last_login: 'Yesterday' },
-        { id: 5, name: 'Jane Clerk', role: 'Staff', email: 'clerk@barangaylink.com', status: 'active', last_login: '5 hours ago' },
-    ];
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await api.get('/users/staff');
+                setUsers(response.data);
+            } catch (error) {
+                console.error('Failed to fetch users:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
 
-    const filteredUsers = mockUsers.filter(u => 
+    const filteredUsers = users.filter(u => 
         u.name.toLowerCase().includes(search.toLowerCase()) || 
         u.role.toLowerCase().includes(search.toLowerCase())
     );

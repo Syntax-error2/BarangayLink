@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
     BarChart2, TrendingUp, Users, Activity,
     Download, Calendar as CalendarIcon, PieChart as PieChartIcon
@@ -7,9 +7,23 @@ import {
     AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend 
 } from 'recharts';
+import api from '../../lib/axios';
 
 export default function Analytics() {
     const [timeRange, setTimeRange] = useState('This Month');
+    const [stats, setStats] = useState(null);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const response = await api.get('/dashboard');
+                setStats(response.data);
+            } catch (error) {
+                console.error('Failed to fetch dashboard data:', error);
+            }
+        };
+        fetchDashboardData();
+    }, []);
 
     const resolutionData = [
         { name: 'Jan', resolved: 45, pending: 12 },
@@ -37,6 +51,13 @@ export default function Analytics() {
     ];
 
     const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+
+    const kpiCards = [
+        { title: 'Total Active Users', value: stats ? stats.total_residents : '0', trend: '+12%', isUp: true, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+        { title: 'Active Emergencies', value: stats ? stats.active_emergencies : '0', trend: '-15%', isUp: true, icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+        { title: 'Pending Service Requests', value: stats ? stats.pending_requests_count : '0', trend: '+5%', isUp: true, icon: BarChart2, color: 'text-purple-600', bg: 'bg-purple-50' },
+        { title: 'Total Incident Reports', value: stats ? stats.total_reports : '0', trend: '-2%', isUp: false, icon: PieChartIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
+    ];
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -68,12 +89,7 @@ export default function Analytics() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {[
-                    { title: 'Total Active Users', value: '1,248', trend: '+12%', isUp: true, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-                    { title: 'Avg. Resolution Time', value: '4.2 hrs', trend: '-15%', isUp: true, icon: Activity, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                    { title: 'Service Requests', value: '340', trend: '+5%', isUp: true, icon: BarChart2, color: 'text-purple-600', bg: 'bg-purple-50' },
-                    { title: 'Resident Satisfaction', value: '94%', trend: '-2%', isUp: false, icon: PieChartIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
-                ].map((kpi, idx) => (
+                {kpiCards.map((kpi, idx) => (
                     <div key={idx} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
                         <div className="flex items-center justify-between mb-4">
                             <div className={`p-2.5 rounded-xl ${kpi.bg} ${kpi.color}`}>
