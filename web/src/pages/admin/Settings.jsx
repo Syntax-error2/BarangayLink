@@ -63,8 +63,9 @@ export default function Settings() {
             if (res.data.barangay) setUser({ ...user, barangay: res.data.barangay });
             setLogoSuccess(true); setTimeout(() => setLogoSuccess(false), 3000);
         } catch (err) {
-            console.error("Logo upload error:", err.response?.data || err.message);
-            setLogoError(err.response?.data?.message || 'Failed to upload logo');
+            console.error("Logo upload error:", err.response?.data || err);
+            const errorMsg = err.response?.data?.message || err.message || 'Failed to upload logo';
+            setLogoError(errorMsg);
         } finally { setLogoLoading(false); }
     };
 
