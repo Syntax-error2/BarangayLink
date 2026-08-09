@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, FileText, AlertTriangle, Bell, Clock, Sun, Moon, CloudSun, CloudRain, MapPin, Thermometer, ChevronRight, Compass, Briefcase, Sparkles, HeartPulse, User as UserIcon } from 'lucide-react';
+import { LogOut, FileText, AlertTriangle, Bell, Clock, Sun, Moon, CloudSun, CloudRain, MapPin, Thermometer, ChevronRight, Compass, Briefcase, Sparkles, HeartPulse, User as UserIcon, Building } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/axios';
 import Card from '../../components/ui/Card';
