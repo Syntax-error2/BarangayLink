@@ -193,7 +193,7 @@ export default function Chatbot() {
             </div>
 
             {/* Input Area */}
-            <div className="fixed bottom-[65px] left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-200/60 p-4 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-[95px] left-0 w-full bg-white/95 backdrop-blur-xl border-t border-slate-200/60 p-4 pb-safe z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
                 <div className="flex gap-2 bg-slate-100 p-1.5 rounded-full border border-slate-200/50">
                     <input 
                         type="text" 

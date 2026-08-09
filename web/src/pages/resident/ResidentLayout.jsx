@@ -38,9 +38,9 @@ export default function ResidentLayout() {
 
             <Outlet />
             
-            <div className="fixed bottom-0 left-0 w-full z-50">
-                <nav className="bg-white/90 backdrop-blur-xl border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.04)] w-full pb-safe">
-                    <div className="flex justify-around items-center h-[65px] px-2 max-w-lg mx-auto pb-2 pt-1">
+            <div className="fixed bottom-0 left-0 w-full z-50 px-5 pb-[env(safe-area-inset-bottom,1rem)] mb-4 pointer-events-none">
+                <nav className="max-w-md mx-auto bg-white/95 backdrop-blur-xl border border-slate-200 shadow-[0_10px_40px_rgba(0,0,0,0.08)] rounded-full pointer-events-auto">
+                    <div className="flex justify-around items-center h-[65px] px-2 py-1">
                         <Link to="/resident" className={`flex flex-col items-center justify-center w-[72px] h-full gap-1 transition-colors ${location.pathname === '/resident' ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
                             <div className={`flex items-center justify-center rounded-2xl transition-all duration-300 ${location.pathname === '/resident' ? 'bg-blue-100/80 w-14 h-8' : 'bg-transparent w-8 h-8'}`}>
                                 <Home size={22} strokeWidth={location.pathname === '/resident' ? 2.5 : 2} />
