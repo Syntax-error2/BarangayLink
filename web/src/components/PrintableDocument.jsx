@@ -1,5 +1,5 @@
 import React from 'react';
-import { getImageUrl } from '../../lib/axios';
+import { getImageUrl } from '../lib/axios';
 
 export default function PrintableDocument({ request }) {
     if (!request) return null;
