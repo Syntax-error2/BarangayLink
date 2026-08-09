@@ -8,7 +8,10 @@ export default function ResidentNotifications() {
     const navigate = useNavigate();
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('All');
     const { fetchUnreadCount } = useResidentNotifications();
+
+    const TABS = ['All', 'Announcements', 'Reports', 'Services', 'Emergency'];
 
     useEffect(() => {
         loadNotifications();
@@ -81,34 +84,59 @@ export default function ResidentNotifications() {
     }
 
     const unreadCount = notifications.filter(n => !n.read_at).length;
+    
+    const filteredNotifications = notifications.filter(n => {
+        if (activeTab === 'All') return true;
+        const type = n.data?.type || '';
+        if (activeTab === 'Announcements' && type === 'Announcement') return true;
+        if (activeTab === 'Reports' && type === 'Report') return true;
+        if (activeTab === 'Services' && type === 'Service') return true;
+        if (activeTab === 'Emergency' && (type === 'Emergency' || type === 'ai_proactive_alert')) return true;
+        return false;
+    });
 
     return (
-        <div className="max-w-lg mx-auto p-6 relative pb-32">
-            <div className="flex justify-between items-end mb-6">
+        <div className="bg-background min-h-screen pb-32">
+            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">Notifications</h2>
-                    <p className="text-slate-500 font-medium text-sm mt-1">
-                        You have {unreadCount} unread update{unreadCount !== 1 ? 's' : ''}.
+                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Notifications</h2>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">
+                        {unreadCount} unread
                     </p>
                 </div>
                 {unreadCount > 0 && (
                     <button 
                         onClick={markAllAsRead}
-                        className="text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1"
+                        className="text-[10px] font-bold text-primary hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
                     >
                         <Check size={14} /> Mark all read
                     </button>
                 )}
             </div>
 
-            <div className="space-y-3">
-                {notifications.length === 0 ? (
-                    <div className="text-center p-12 text-slate-500 font-medium text-sm bg-white rounded-3xl border border-dashed border-slate-300">
-                        <Bell className="mx-auto mb-3 opacity-20" size={32} />
-                        You have no notifications yet.
-                    </div>
+            <div className="max-w-lg mx-auto p-6 pt-[88px]">
+                
+                {/* Horizontal Scrollable Tabs */}
+                <div className="flex gap-2 overflow-x-auto pb-4 mb-2 snap-x hide-scrollbar -mx-6 px-6">
+                    {TABS.map(tab => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`snap-start whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold transition-all ${activeTab === tab ? 'bg-slate-800 text-white shadow-md' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="space-y-3">
+                    {filteredNotifications.length === 0 ? (
+                        <div className="text-center p-12 text-slate-500 font-medium text-sm bg-white rounded-3xl border border-dashed border-slate-300">
+                            <Bell className="mx-auto mb-3 opacity-20" size={32} />
+                            No notifications in this category.
+                        </div>
                 ) : (
-                    notifications.map(n => {
+                    filteredNotifications.map(n => {
                         const data = n.data || {};
                         const isUnread = !n.read_at;
 
@@ -141,6 +169,7 @@ export default function ResidentNotifications() {
                         );
                     })
                 )}
+                </div>
             </div>
         </div>
     );
