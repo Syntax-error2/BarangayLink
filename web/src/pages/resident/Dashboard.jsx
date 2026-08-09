@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { LogOut, FileText, AlertTriangle, Bell, Clock, Sun, Moon, CloudSun, CloudRain, MapPin, Thermometer, ChevronRight, Compass, Briefcase, Sparkles, HeartPulse, User as UserIcon, Building } from 'lucide-react';
+import { LogOut, FileText, AlertTriangle, Bell, Clock, Sun, Moon, CloudSun, CloudRain, MapPin, Thermometer, ChevronRight, Compass, Briefcase, Sparkles, HeartPulse, User as UserIcon, Building, Pill } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/axios';
 import Card from '../../components/ui/Card';
@@ -207,10 +207,10 @@ export default function ResidentDashboard() {
                             <span className="text-[10px] font-semibold text-center text-red-600 leading-tight">Emergency<br/>SOS</span>
                         </button>
                         <button onClick={() => navigate('/resident/services')} className="flex flex-col items-center gap-2 group active:scale-95 transition-transform">
-                            <div className="w-[60px] h-[60px] rounded-[18px] bg-white border border-slate-100 shadow-sm flex items-center justify-center text-slate-600 group-hover:border-blue-200 group-hover:text-blue-600 transition-colors">
-                                <Briefcase size={24} strokeWidth={1.5} />
+                            <div className="w-[60px] h-[60px] rounded-[18px] bg-rose-50 border border-rose-100 shadow-sm flex items-center justify-center text-rose-500 group-hover:bg-rose-100 transition-colors">
+                                <Pill size={24} strokeWidth={1.5} />
                             </div>
-                            <span className="text-[10px] font-semibold text-center text-slate-600 leading-tight">Barangay<br/>Services</span>
+                            <span className="text-[10px] font-semibold text-center text-rose-600 leading-tight">Request<br/>Medicine</span>
                         </button>
                     </div>
                 </section>
