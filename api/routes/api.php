@@ -19,6 +19,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard']);
+    Route::get('/map-data', [\App\Http\Controllers\Api\MapController::class, 'getMapData']);
+    Route::get('/audit-logs', [\App\Http\Controllers\Api\AuditLogController::class, 'index']);
     Route::get('/notifications/unread-count', [DashboardController::class, 'getUnreadCounts']);
     
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
@@ -30,6 +32,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('service-requests', ServiceRequestController::class);
     Route::apiResource('emergencies', EmergencyController::class);
     Route::apiResource('announcements', AnnouncementController::class);
+    Route::apiResource('documents', \App\Http\Controllers\Api\DocumentController::class);
     
     Route::get('/categories', [CategoryController::class, 'getCategories']);
     
