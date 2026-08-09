@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import api from '../../lib/axios';
+import api, { getImageUrl } from '../../lib/axios';
 import { Upload, Image as ImageIcon, Save, CheckCircle2, Building, Mail, Phone, MapPin, Lock, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -14,7 +14,7 @@ export default function Settings() {
     const [logoSuccess, setLogoSuccess] = useState(false);
     const [logoError, setLogoError] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(
-        user?.barangay?.logo_path ? `http://127.0.0.1:8000/${user.barangay.logo_path}` : null
+        user?.barangay?.logo_path ? getImageUrl(user.barangay.logo_path) : null
     );
     const fileInputRef = useRef(null);
 
@@ -59,7 +59,7 @@ export default function Settings() {
         setLogoLoading(true); setLogoError(null); setLogoSuccess(false);
         const formData = new FormData(); formData.append('logo', file);
         try {
-            const res = await api.post('/settings/logo', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            const res = await api.post('/settings/logo', formData);
             if (res.data.barangay) setUser({ ...user, barangay: res.data.barangay });
             setLogoSuccess(true); setTimeout(() => setLogoSuccess(false), 3000);
         } catch (err) {
