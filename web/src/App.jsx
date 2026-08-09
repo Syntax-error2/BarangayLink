@@ -23,6 +23,7 @@ import AdminResidents from './pages/admin/Residents';
 import AdminUsers from './pages/admin/Users';
 import AdminMessages from './pages/admin/Messages';
 import AdminEvents from './pages/admin/Events';
+import AdminBroadcast from './pages/admin/Broadcast';
 import AdminLogs from './pages/admin/Logs';
 import AdminDocuments from './pages/admin/Documents';
 import { NotificationProvider } from './context/NotificationContext';
@@ -85,6 +86,7 @@ function App() {
                                 <Route path="users" element={<AdminUsers />} />
                                 <Route path="emergencies" element={<AdminEmergencies />} />
                                 <Route path="announcements" element={<AdminAnnouncements />} />
+                                <Route path="broadcast" element={<AdminBroadcast />} />
                                 <Route path="messages" element={<AdminMessages />} />
                                 <Route path="events" element={<AdminEvents />} />
                                 <Route path="documents" element={<AdminDocuments />} />
