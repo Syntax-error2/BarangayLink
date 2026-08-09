@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -43,11 +43,13 @@ const RootRedirect = () => {
 };
 
 function App() {
+    const Router = isApp() ? HashRouter : BrowserRouter;
+    
     return (
         <AuthProvider>
             <NotificationProvider>
                 <ResidentNotificationProvider>
-                    <BrowserRouter>
+                    <Router>
                         <Routes>
                             <Route path="/" element={<RootRedirect />} />
                             <Route path="/onboarding" element={<Onboarding />} />
@@ -74,7 +76,7 @@ function App() {
                                 <Route path="settings" element={<AdminSettings />} />
                             </Route>
                         </Routes>
-                    </BrowserRouter>
+                    </Router>
                 </ResidentNotificationProvider>
             </NotificationProvider>
         </AuthProvider>
