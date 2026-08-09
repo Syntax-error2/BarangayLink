@@ -109,7 +109,7 @@ export default function GISMap() {
                     100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
                 }
             `}</style>
-            <div className="absolute top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
+            <div className="absolute top-0 left-0 w-full z-10 p-4 px-6 pt-[calc(env(safe-area-inset-top)+16px)] bg-white shadow-sm border-b border-border flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-bold text-text-primary tracking-tight">Community Map</h2>
                     {brgyHallLoc && <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{user?.barangay?.name} Hall Pinned</p>}

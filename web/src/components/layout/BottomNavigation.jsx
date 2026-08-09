@@ -19,12 +19,12 @@ export default function BottomNavigation() {
                         <span className="text-[10px] font-bold">Reports</span>
                     </Link>
 
-                    {/* SOS Floating Action Button */}
-                    <div className="relative w-[20%] h-full flex justify-center">
-                        <Link to="/resident/sos" className="absolute -top-6 w-16 h-16 rounded-full bg-red-600 shadow-[0_8px_30px_rgba(220,38,38,0.4)] flex items-center justify-center text-white border-4 border-white hover:bg-red-700 active:scale-95 transition-all z-10">
-                            <span className="font-black text-sm tracking-widest">SOS</span>
-                        </Link>
-                    </div>
+                    {/* SOS Button */}
+                    <Link to="/resident/sos" className="flex flex-col items-center justify-center w-[20%] h-full transition-colors">
+                        <div className="w-12 h-12 mb-1 rounded-full bg-red-600 shadow-md flex items-center justify-center text-white hover:bg-red-700 active:scale-95 transition-all">
+                            <span className="font-black text-xs tracking-widest">SOS</span>
+                        </div>
+                    </Link>
 
                     <Link to="/resident/services" className={`flex flex-col items-center justify-center w-[20%] h-full gap-1 transition-colors ${isActive('/resident/services') ? 'text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>
                         <Briefcase size={24} strokeWidth={isActive('/resident/services') ? 2.5 : 2} />

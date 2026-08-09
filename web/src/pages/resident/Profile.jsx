@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { LogOut, User, MapPin, Phone, Mail, ShieldCheck, Check, X, ChevronRight, FileText, Settings, HelpCircle, Info, Briefcase, Camera, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ export default function Profile() {
     });
     const [loading, setLoading] = useState(false);
 
-    const fileInputRef = React.useRef(null);
+    const fileInputRef = useRef(null);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
     const handleLogout = () => {
