@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { Home, HeartPulse, Baby } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -15,7 +17,16 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Custom blue dot for user location
+const createMarkerIcon = (IconComponent, bgColor, borderRadius = '6px') => {
+    const iconHtml = renderToStaticMarkup(<IconComponent size={14} color="white" strokeWidth={2.5} />);
+    return L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="background-color: ${bgColor}; width: 24px; height: 24px; border-radius: ${borderRadius}; border: 2px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">${iconHtml}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
+    });
+};
+
 const UserIcon = L.divIcon({
     className: 'custom-div-icon',
     html: `<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); animation: pulse 2s infinite;"></div>`,
@@ -23,21 +34,9 @@ const UserIcon = L.divIcon({
     iconAnchor: [8, 8]
 });
 
-// Custom green building for Barangay Hall
-const HallIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div style="background-color: #10b981; width: 24px; height: 24px; border-radius: 6px; border: 2px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-});
-
-// Custom red cross for Health Center
-const HealthIcon = L.divIcon({
-    className: 'custom-div-icon',
-    html: `<div style="background-color: #ef4444; width: 24px; height: 24px; border-radius: 12px; border: 2px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-});
+const HallIcon = createMarkerIcon(Home, '#10b981'); // Emerald
+const HealthIcon = createMarkerIcon(HeartPulse, '#ef4444', '12px'); // Red circle
+const DaycareIcon = createMarkerIcon(Baby, '#f59e0b', '12px'); // Amber circle
 
 // Component to dynamically update map center
 function ChangeView({ center }) {
@@ -72,13 +71,20 @@ export default function GISMap() {
                         setBrgyHallLoc([lat, lon]);
                         setCenter([lat, lon]); // Center on Barangay Hall initially
                         
-                        // Search for nearby Health Centers / Clinics using Overpass or just Nominatim
-                        const healthQuery = `Health Center, ${user.barangay.name}, ${user.barangay.city}`;
-                        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(healthQuery)}&format=json`)
-                            .then(r => r.json())
-                            .then(hData => {
-                                setPois(hData.map(h => ({ name: h.display_name, lat: parseFloat(h.lat), lon: parseFloat(h.lon), type: 'health' })));
-                            });
+                        // Search for nearby Health Centers and Daycares sequentially
+                        const searchPoi = (poiName, type, icon) => {
+                            const pQuery = `${poiName}, ${user.barangay.name}, ${user.barangay.city}`;
+                            fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(pQuery)}&format=json`)
+                                .then(r => r.json())
+                                .then(hData => {
+                                    if (hData.length > 0) {
+                                        setPois(prev => [...prev, ...hData.map(h => ({ name: h.display_name, lat: parseFloat(h.lat), lon: parseFloat(h.lon), type, icon }))]);
+                                    }
+                                });
+                        };
+
+                        searchPoi('Health Center', 'Health Center', HealthIcon);
+                        setTimeout(() => searchPoi('Daycare', 'Daycare Center', DaycareIcon), 1000);
                     }
                 });
         }
@@ -109,15 +115,16 @@ export default function GISMap() {
                     100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
                 }
             `}</style>
-            <div className="absolute top-0 left-0 w-full z-10 p-4 px-6 pt-[calc(env(safe-area-inset-top)+16px)] bg-white shadow-sm border-b border-border flex items-center justify-between">
+            <div className="absolute top-0 left-0 w-full z-10 p-4 px-6 pt-[calc(env(safe-area-inset-top)+16px)] bg-white/90 backdrop-blur-md shadow-sm border-b border-border flex items-center justify-between">
                 <div>
                     <h2 className="text-xl font-bold text-text-primary tracking-tight">Community Map</h2>
                     {brgyHallLoc && <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{user?.barangay?.name} Hall Pinned</p>}
                 </div>
-                {userLoc && <span className="badge badge-info bg-blue-50 text-blue-600 border-none font-bold text-xs">GPS Active</span>}
+                {userLoc && <span className="badge badge-info bg-blue-50 text-blue-600 border-none font-bold text-xs px-3">GPS Active</span>}
             </div>
-            <div className="absolute inset-0 z-0 bg-gray-100 pt-[140px] pb-[85px]">
-                <MapContainer center={center} zoom={16} style={{ height: '100%', width: '100%' }} zoomControl={false}>
+            
+            <div className="absolute inset-0 z-0 bg-gray-100">
+                <MapContainer center={center} zoom={16} style={{ height: '100%', width: '100%' }} zoomControl={false} className="pb-[85px] pt-[calc(env(safe-area-inset-top)+80px)]">
                     <ChangeView center={center} />
                     <TileLayer
                         attribution='&copy; OpenStreetMap'
@@ -143,12 +150,12 @@ export default function GISMap() {
                         </Marker>
                     )}
 
-                    {/* POI Markers (Health Centers) */}
+                    {/* POI Markers */}
                     {pois.map((poi, idx) => (
-                        <Marker key={'poi-'+idx} position={[poi.lat, poi.lon]} icon={HealthIcon}>
+                        <Marker key={'poi-'+idx} position={[poi.lat, poi.lon]} icon={poi.icon}>
                             <Popup>
                                 <div className="text-center min-w-[100px]">
-                                    <h4 className="font-bold text-red-600">Health Center</h4>
+                                    <h4 className={`font-bold ${poi.type === 'Daycare Center' ? 'text-amber-600' : 'text-red-600'}`}>{poi.type}</h4>
                                     <p className="text-xs text-gray-500">{poi.name.split(',')[0]}</p>
                                 </div>
                             </Popup>
