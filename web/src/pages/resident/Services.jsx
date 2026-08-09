@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
-import { Briefcase, CheckCircle2, ChevronRight, FileText, ClipboardList, Shield, Home, Building, X, Send } from 'lucide-react';
+import { Briefcase, CheckCircle2, ChevronRight, FileText, ClipboardList, Shield, Home, Building, X, Send, HeartPulse } from 'lucide-react';
 import Header from '../../components/layout/Header';
 
 export default function Services() {
@@ -43,6 +43,7 @@ export default function Services() {
 
     const getServiceIcon = (name) => {
         const n = name.toLowerCase();
+        if (n.includes('medicine') || n.includes('medical') || n.includes('health')) return { icon: HeartPulse, color: 'text-rose-600', bg: 'bg-rose-50', hover: 'hover:border-rose-200 hover:shadow-[0_8px_30px_rgb(225,29,72,0.15)]' };
         if (n.includes('clearance')) return { icon: Shield, color: 'text-indigo-600', bg: 'bg-indigo-50', hover: 'hover:border-indigo-200 hover:shadow-[0_8px_30px_rgb(79,70,229,0.15)]' };
         if (n.includes('indigency')) return { icon: Home, color: 'text-emerald-600', bg: 'bg-emerald-50', hover: 'hover:border-emerald-200 hover:shadow-[0_8px_30px_rgb(16,185,129,0.15)]' };
         if (n.includes('business')) return { icon: Building, color: 'text-blue-600', bg: 'bg-blue-50', hover: 'hover:border-blue-200 hover:shadow-[0_8px_30px_rgb(37,99,235,0.15)]' };
