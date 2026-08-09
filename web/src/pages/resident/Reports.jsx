@@ -7,6 +7,7 @@ export default function Reports() {
     const [categories, setCategories] = useState([]);
     const [activeTab, setActiveTab] = useState('reports'); // 'reports', 'history'
     const [loadingId, setLoadingId] = useState(null);
+    const [reportModal, setReportModal] = useState({ isOpen: false, category: null });
 
     useEffect(() => {
         loadData();
@@ -21,10 +22,14 @@ export default function Reports() {
         setCategories(catRes.data.reports || []);
     };
 
-    const handleOneClickReport = async (categoryId, categoryName) => {
-        if (!confirm(`Report a ${categoryName} at your current location?`)) return;
-        
-        setLoadingId(categoryId);
+    const handleOneClickReportClick = (category) => {
+        setReportModal({ isOpen: true, category });
+    };
+
+    const confirmOneClickReport = async () => {
+        const cat = reportModal.category;
+        setReportModal({ isOpen: false, category: null });
+        setLoadingId(cat.id);
         
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by your browser.");
@@ -36,8 +41,8 @@ export default function Reports() {
             async (position) => {
                 try {
                     const data = {
-                        category_id: categoryId,
-                        title: `Mobile Report: ${categoryName}`,
+                        category_id: cat.id,
+                        title: `Mobile Report: ${cat.name}`,
                         description: '1-Click report submitted from mobile app.',
                         address: 'Location pinned via GPS',
                         latitude: position.coords.latitude,
@@ -46,6 +51,7 @@ export default function Reports() {
                     await api.post('/reports', data);
                     await loadData();
                     setActiveTab('history');
+                    // We can use a custom toast instead of alert later if desired
                     alert('Report submitted successfully! Responders have been notified.');
                 } catch (err) {
                     alert('Failed to submit report');
@@ -75,8 +81,15 @@ export default function Reports() {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-6 min-h-screen pb-32">
-            <h2 className="text-3xl font-black text-text-primary tracking-tight mb-6">Reports</h2>
+        <div className="bg-background min-h-screen pb-32">
+            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Reports & Issues</h2>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Community Action</p>
+                </div>
+            </div>
+            
+            <div className="max-w-lg mx-auto p-6 pt-[88px]">
 
             {/* Flat Toggle Tabs */}
             <div className="flex bg-gray-100 p-1.5 rounded-2xl mb-8">
@@ -105,7 +118,7 @@ export default function Reports() {
                                 <button 
                                     key={cat.id} 
                                     disabled={isProcessing}
-                                    onClick={() => handleOneClickReport(cat.id, cat.name)}
+                                    onClick={() => handleOneClickReportClick(cat)}
                                     className={`card bg-white/80 backdrop-blur-md p-5 border border-white/50 ${style.hover} flex flex-col items-center justify-center text-center gap-3 transition-all active:scale-[0.98] ${isProcessing ? 'opacity-70 pointer-events-none' : ''}`}
                                 >
                                     <div className={`h-14 w-14 rounded-[1.25rem] flex items-center justify-center ${style.bg} shrink-0`}>
@@ -155,6 +168,46 @@ export default function Reports() {
                     )}
                 </div>
             )}
+            </div>
+
+            {/* Bottom Sheet Confirm Modal */}
+            {reportModal.isOpen && reportModal.category && (() => {
+                const style = getReportIcon(reportModal.category.name);
+                const Icon = style.icon;
+                return (
+                    <div className="fixed inset-0 z-50 flex flex-col justify-end">
+                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setReportModal({ isOpen: false, category: null })}></div>
+                        <div className="relative bg-white w-full max-w-lg mx-auto rounded-t-[2.5rem] shadow-2xl p-6 sm:p-8 animate-in slide-in-from-bottom-full duration-300 ease-out">
+                            <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
+                            <div className="flex flex-col items-center text-center mb-6">
+                                <div className={`h-20 w-20 rounded-full flex items-center justify-center ${style.bg} mb-4 shadow-sm`}>
+                                    <Icon size={36} className={style.color} strokeWidth={2} />
+                                </div>
+                                <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-2">Report {reportModal.category.name}?</h3>
+                                <p className="text-slate-500 font-medium text-sm px-4">
+                                    This will securely pin your current GPS location and dispatch an alert to the barangay responders.
+                                </p>
+                            </div>
+                            
+                            <div className="space-y-3">
+                                <button 
+                                    onClick={confirmOneClickReport}
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-red-600 text-white rounded-2xl text-sm font-bold shadow-[0_4px_14px_rgba(220,38,38,0.3)] hover:bg-red-700 active:scale-[0.98] transition-all"
+                                >
+                                    <AlertTriangle size={18} /> Confirm Report
+                                </button>
+                                <button 
+                                    onClick={() => setReportModal({ isOpen: false, category: null })}
+                                    className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-slate-100 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-200 active:scale-[0.98] transition-all"
+                                >
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
         </div>
     );
 }

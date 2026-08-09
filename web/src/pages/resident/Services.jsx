@@ -50,8 +50,15 @@ export default function Services() {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-6 min-h-screen pb-32 relative">
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-6">Services</h2>
+        <div className="bg-background min-h-screen pb-32 relative">
+            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Services</h2>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Barangay Hall</p>
+                </div>
+            </div>
+            
+            <div className="max-w-lg mx-auto p-6 pt-[88px]">
 
             <div className="flex bg-slate-100 p-1.5 rounded-2xl mb-8">
                 <button 
@@ -164,6 +171,7 @@ export default function Services() {
                     </div>
                 </div>
             )}
+            </div>
         </div>
     );
 }

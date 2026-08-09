@@ -11,6 +11,7 @@ export default function ResidentDashboard() {
     // Data States
     const [announcements, setAnnouncements] = useState([]);
     const [recentActivity, setRecentActivity] = useState([]);
+    const [loadingData, setLoadingData] = useState(true);
     
     // Twist States
     const [locationState, setLocationState] = useState(sessionStorage.getItem('locationState') || 'prompt'); // 'prompt', 'loading', 'granted', 'denied'
@@ -34,6 +35,8 @@ export default function ResidentDashboard() {
                 setRecentActivity(activities);
             } catch (error) {
                 console.error("Failed to load dashboard data");
+            } finally {
+                setLoadingData(false);
             }
         };
         fetchData();
@@ -93,14 +96,18 @@ export default function ResidentDashboard() {
 
     return (
         <div className="min-h-screen bg-background font-sans pb-24 selection:bg-primary selection:text-white">
+            
+            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-bold text-text-primary tracking-tight">Dashboard</h2>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">{timeContext.greeting}</p>
+                </div>
+            </div>
 
-            <main className="p-6 max-w-lg mx-auto space-y-6">
+            <main className="p-6 pt-[88px] max-w-lg mx-auto space-y-6">
                 {/* Clean Flat Greeting */}
                 <div className="flex justify-between items-end">
                     <div>
-                        <p className="text-text-secondary font-bold text-sm tracking-widest uppercase mb-1">
-                            {timeContext.greeting}
-                        </p>
                         <h2 className="text-3xl font-black text-text-primary tracking-tight">Hello, {user?.first_name}</h2>
                     </div>
                 </div>
@@ -176,7 +183,16 @@ export default function ResidentDashboard() {
                         <span className="text-xs font-bold text-accent uppercase tracking-widest">Live Updates</span>
                     </div>
                     <div className="flex gap-4 overflow-x-auto pb-6 pt-1 px-1 snap-x hide-scrollbar -mx-6 px-6">
-                        {announcements.length === 0 ? (
+                        {loadingData ? (
+                            [1, 2].map(i => (
+                                <div key={i} className="card min-w-[280px] p-5 bg-white border-transparent shadow-[0_8px_30px_rgb(0,0,0,0.04)] snap-start">
+                                    <div className="h-4 bg-gray-200 rounded w-1/3 mb-4 animate-pulse"></div>
+                                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-full mb-1 animate-pulse"></div>
+                                    <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse"></div>
+                                </div>
+                            ))
+                        ) : announcements.length === 0 ? (
                             <div className="w-full card p-6 bg-gray-50/50 border-dashed text-center">
                                 <p className="text-xs font-bold text-text-muted uppercase tracking-wider">All caught up!</p>
                             </div>
@@ -200,7 +216,17 @@ export default function ResidentDashboard() {
                 <section className="px-1">
                     <h3 className="font-extrabold text-lg text-text-primary mb-4">My History</h3>
                     <div className="space-y-5 relative">
-                        {recentActivity.length === 0 ? (
+                        {loadingData ? (
+                            [1, 2, 3].map(i => (
+                                <div key={i} className="flex gap-4 animate-pulse">
+                                    <div className="h-10 w-10 bg-gray-200 rounded-full shrink-0"></div>
+                                    <div className="flex-1 py-1">
+                                        <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                                        <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : recentActivity.length === 0 ? (
                             <div className="text-center py-6 text-sm font-semibold text-text-muted">No recent requests found.</div>
                         ) : (
                             recentActivity.map((act, i) => (

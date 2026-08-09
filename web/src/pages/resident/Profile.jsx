@@ -32,8 +32,15 @@ export default function Profile() {
     };
 
     return (
-        <div className="max-w-lg mx-auto px-6 pt-4 pb-32 min-h-screen">
-            <h2 className="text-3xl font-black text-text-primary tracking-tight mb-6">My Profile</h2>
+        <div className="bg-background min-h-screen pb-32">
+            <div className="fixed top-16 left-0 w-full z-10 p-4 px-6 bg-white shadow-sm border-b border-border flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-bold text-text-primary tracking-tight">My Profile</h2>
+                    <p className="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Account Details</p>
+                </div>
+            </div>
+            
+            <div className="max-w-lg mx-auto px-6 pt-[88px]">
 
             {/* Flat ID Card */}
             <div className="card bg-primary p-6 mb-8 border-0 text-white shadow-sm">
@@ -120,6 +127,7 @@ export default function Profile() {
                         <LogOut size={18} /> Sign Out
                     </button>
                 )}
+            </div>
             </div>
         </div>
     );
