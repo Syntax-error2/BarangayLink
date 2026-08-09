@@ -17,6 +17,13 @@ import AdminServices from './pages/admin/Services';
 import AdminEmergencies from './pages/admin/Emergencies';
 import AdminAnnouncements from './pages/admin/Announcements';
 import AdminSettings from './pages/admin/Settings';
+import AdminMap from './pages/admin/Map';
+import AdminAnalytics from './pages/admin/Analytics';
+import AdminResidents from './pages/admin/Residents';
+import AdminUsers from './pages/admin/Users';
+import AdminMessages from './pages/admin/Messages';
+import AdminEvents from './pages/admin/Events';
+import AdminLogs from './pages/admin/Logs';
 import { NotificationProvider } from './context/NotificationContext';
 
 import { ResidentNotificationProvider } from './context/ResidentNotificationContext';
@@ -69,11 +76,18 @@ function App() {
                             </Route>
                             <Route path="/admin" element={<ProtectedRoute allowedRoles={['super-admin', 'barangay-admin', 'staff', 'responder']}><AdminLayout /></ProtectedRoute>}>
                                 <Route index element={<AdminDashboard />} />
+                                <Route path="map" element={<AdminMap />} />
+                                <Route path="analytics" element={<AdminAnalytics />} />
                                 <Route path="reports" element={<AdminReports />} />
                                 <Route path="services" element={<AdminServices />} />
+                                <Route path="residents" element={<AdminResidents />} />
+                                <Route path="users" element={<AdminUsers />} />
                                 <Route path="emergencies" element={<AdminEmergencies />} />
                                 <Route path="announcements" element={<AdminAnnouncements />} />
+                                <Route path="messages" element={<AdminMessages />} />
+                                <Route path="events" element={<AdminEvents />} />
                                 <Route path="settings" element={<AdminSettings />} />
+                                <Route path="logs" element={<AdminLogs />} />
                             </Route>
                         </Routes>
                     </Router>

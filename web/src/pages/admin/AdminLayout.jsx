@@ -65,9 +65,10 @@ export default function AdminLayout() {
     const todayDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     return (
-        <div className="min-h-screen flex bg-[#f8fafc] font-sans relative overflow-hidden text-slate-900">
-            {/* Dark Sidebar */}
-            <aside className="w-[280px] bg-[#0f3b8e] text-white flex-col hidden md:flex z-10 shrink-0">
+        <div className="flex min-h-screen bg-[#f8fafc]">
+            
+            {/* Sidebar */}
+            <aside className="w-[280px] bg-[#0f3b8e] h-screen sticky top-0 shrink-0 flex flex-col shadow-2xl z-20">
                 {/* Logo Area */}
                 <div className="p-6 flex items-center gap-3">
                     <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm shrink-0">
@@ -105,7 +106,7 @@ export default function AdminLayout() {
                                                 {item.label}
                                             </div>
                                             {item.badge > 0 && (
-                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${active ? 'bg-red-500 text-white' : 'bg-red-500 text-white'}`}>
+                                                <span className="text-xs font-bold text-blue-200 ml-auto">
                                                     {item.badge}
                                                 </span>
                                             )}
@@ -130,7 +131,7 @@ export default function AdminLayout() {
                             </div>
                             <div className="min-w-0 flex-1">
                                 <p className="text-xs font-bold text-white truncate">{user?.barangay?.name ? `Barangay ${user.barangay.name}` : 'San Isidro'}</p>
-                                <p className="text-[10px] text-blue-200 truncate">Municipality of Example</p>
+                                <p className="text-[10px] text-blue-200 truncate">Municipality of Binalbagan</p>
                             </div>
                         </div>
                         <ChevronDown size={14} className="text-blue-300 shrink-0" />
@@ -146,10 +147,10 @@ export default function AdminLayout() {
             </aside>
             
             {/* Main Content Area */}
-            <main className="flex-1 flex flex-col h-screen overflow-hidden z-10 relative">
+            <main className="flex-1 flex flex-col">
                 
                 {/* Header */}
-                <header className="h-20 bg-[#f8fafc] flex items-center justify-between px-8 shrink-0 z-20 w-full pt-4">
+                <header className="h-20 bg-[#f8fafc] flex items-center justify-between px-8 shrink-0 z-10 w-full pt-4">
                     {/* Greeting */}
                     <div className="flex-1">
                         <h2 className="font-bold text-2xl text-slate-900 tracking-tight flex items-center gap-2">
@@ -199,14 +200,14 @@ export default function AdminLayout() {
                 </header>
                 
                 {/* Dynamic Page Content */}
-                <div className="flex-1 overflow-auto p-8 pt-6 pb-20">
+                <div className="flex-1 flex flex-col p-8 pt-6 pb-20">
                     <Outlet />
-                    
-                    {/* Footer */}
-                    <div className="mt-12 flex items-center justify-between text-xs font-medium text-slate-400 border-t border-slate-200 pt-6 pb-2">
-                        <p>© 2026 BarangayLink. All rights reserved.</p>
-                        <p>Version 1.0.0</p>
-                    </div>
+                </div>
+
+                {/* Fixed Footer */}
+                <div className="fixed bottom-0 left-[280px] right-0 bg-white border-t border-slate-200 px-8 py-3 flex items-center justify-between text-[11px] font-medium text-slate-500 z-30">
+                    <p>© 2026 BarangayLink. All rights reserved.</p>
+                    <p>Version 1.0.0</p>
                 </div>
             </main>
             
