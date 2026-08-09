@@ -19,10 +19,16 @@ export const getImageUrl = (path) => {
     if (!path) return '';
     if (path.startsWith('http')) return path;
     if (path.startsWith('data:')) return path; // Handle base64 encoded images from database
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
-    const serverUrl = baseUrl.replace('/api', '');
-    // Ensure path doesn't start with a slash if serverUrl ends with one
-    return `${serverUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+    
+    let baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api';
+    
+    // Safely remove the trailing /api
+    if (baseUrl.endsWith('/api')) {
+        baseUrl = baseUrl.slice(0, -4);
+    }
+    
+    // Ensure path doesn't start with a slash if baseUrl ends with one
+    return `${baseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 };
 
 export default api;
