@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications/unread-count', [DashboardController::class, 'getUnreadCounts']);
     
     Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/user/profile/avatar', [AuthController::class, 'uploadAvatar']);
     
     Route::apiResource('reports', ReportController::class);
     Route::put('/reports/{report}/status', [ReportController::class, 'updateStatus']);

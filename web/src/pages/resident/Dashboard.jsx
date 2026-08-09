@@ -17,8 +17,8 @@ export default function ResidentDashboard() {
     const [loadingData, setLoadingData] = useState(true);
     
     // Twist States
-    const [locationState, setLocationState] = useState(sessionStorage.getItem('locationState') || 'prompt'); // 'prompt', 'loading', 'granted', 'denied'
-    const [weatherData, setWeatherData] = useState(JSON.parse(sessionStorage.getItem('weatherData')) || null);
+    const [locationState, setLocationState] = useState(localStorage.getItem('locationState') || 'prompt'); // 'prompt', 'loading', 'granted', 'denied'
+    const [weatherData, setWeatherData] = useState(JSON.parse(localStorage.getItem('weatherData')) || null);
     const [timeContext, setTimeContext] = useState({ greeting: 'Welcome', icon: Sun, gradient: 'from-blue-500 to-sky-400' });
 
     useEffect(() => {
@@ -78,20 +78,22 @@ export default function ResidentDashboard() {
                             temp: Math.round(weatherData.current_weather.temperature),
                             code: weatherData.current_weather.weathercode,
                             isDay: weatherData.current_weather.is_day,
-                            locationName: geoData.city || geoData.locality || geoData.principalSubdivision || 'Local Area'
+                            locationName: geoData.city || geoData.locality || geoData.principalSubdivision || 'Local Area',
+                            latitude: lat,
+                            longitude: lon
                         };
                         setWeatherData(newWeatherData);
                         setLocationState('granted');
-                        sessionStorage.setItem('weatherData', JSON.stringify(newWeatherData));
-                        sessionStorage.setItem('locationState', 'granted');
+                        localStorage.setItem('weatherData', JSON.stringify(newWeatherData));
+                        localStorage.setItem('locationState', 'granted');
                     } catch (e) {
                         setLocationState('granted'); // Granted but fetch failed
-                        sessionStorage.setItem('locationState', 'granted');
+                        localStorage.setItem('locationState', 'granted');
                     }
                 },
                 () => {
                     setLocationState('denied');
-                    sessionStorage.setItem('locationState', 'denied');
+                    localStorage.setItem('locationState', 'denied');
                 }
             );
         }

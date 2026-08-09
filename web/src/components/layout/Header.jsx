@@ -5,7 +5,7 @@ export default function Header({ title, rightAction, onBack }) {
     const navigate = useNavigate();
 
     return (
-        <div className="sticky top-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 flex items-center justify-between h-14 px-4">
+        <div className="sticky top-0 left-0 w-full z-40 bg-white/95 backdrop-blur-md border-b border-slate-100 flex items-center justify-between min-h-14 px-4 pt-[calc(env(safe-area-inset-top)+8px)] pb-3">
             <div className="flex items-center gap-3">
                 <button 
                     onClick={onBack || (() => navigate(-1))}

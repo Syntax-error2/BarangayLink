@@ -31,6 +31,14 @@ const HallIcon = L.divIcon({
     iconAnchor: [12, 12]
 });
 
+// Custom red cross for Health Center
+const HealthIcon = L.divIcon({
+    className: 'custom-div-icon',
+    html: `<div style="background-color: #ef4444; width: 24px; height: 24px; border-radius: 12px; border: 2px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12]
+});
+
 // Component to dynamically update map center
 function ChangeView({ center }) {
   const map = useMap();
@@ -44,7 +52,8 @@ export default function GISMap() {
     const [userLoc, setUserLoc] = useState(null);
     const [brgyHallLoc, setBrgyHallLoc] = useState(null);
     const [center, setCenter] = useState([14.5547, 121.0244]); // Makati center placeholder
-    
+    const [pois, setPois] = useState([]);
+
     useEffect(() => {
         api.get('/reports').then(res => {
             // Filter out reports without coordinates
@@ -62,6 +71,14 @@ export default function GISMap() {
                         const lon = parseFloat(data[0].lon);
                         setBrgyHallLoc([lat, lon]);
                         setCenter([lat, lon]); // Center on Barangay Hall initially
+                        
+                        // Search for nearby Health Centers / Clinics using Overpass or just Nominatim
+                        const healthQuery = `Health Center, ${user.barangay.name}, ${user.barangay.city}`;
+                        fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(healthQuery)}&format=json`)
+                            .then(r => r.json())
+                            .then(hData => {
+                                setPois(hData.map(h => ({ name: h.display_name, lat: parseFloat(h.lat), lon: parseFloat(h.lon), type: 'health' })));
+                            });
                     }
                 });
         }
@@ -125,6 +142,18 @@ export default function GISMap() {
                             <Popup>You are here</Popup>
                         </Marker>
                     )}
+
+                    {/* POI Markers (Health Centers) */}
+                    {pois.map((poi, idx) => (
+                        <Marker key={'poi-'+idx} position={[poi.lat, poi.lon]} icon={HealthIcon}>
+                            <Popup>
+                                <div className="text-center min-w-[100px]">
+                                    <h4 className="font-bold text-red-600">Health Center</h4>
+                                    <p className="text-xs text-gray-500">{poi.name.split(',')[0]}</p>
+                                </div>
+                            </Popup>
+                        </Marker>
+                    ))}
 
                     {/* Report Markers */}
                     {reports.map(report => (

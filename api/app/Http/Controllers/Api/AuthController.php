@@ -105,4 +105,22 @@ class AuthController extends Controller
 
         return response()->json(['message' => 'Profile updated successfully']);
     }
+
+    public function uploadAvatar(Request $request)
+    {
+        $request->validate([
+            'avatar' => 'required|string'
+        ]);
+
+        $user = $request->user();
+        
+        // The frontend will send the compressed base64 string directly
+        $user->profile_photo_path = $request->avatar;
+        $user->save();
+
+        return response()->json([
+            'message' => 'Avatar updated successfully',
+            'avatar_url' => $user->profile_photo_path
+        ]);
+    }
 }

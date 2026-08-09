@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
 import { CheckCircle2, ChevronRight, AlertTriangle, ShieldAlert, Car, Trash2, Flame, CloudRain, Sun, Bell, MapPin, Image as ImageIcon } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
 import Header from '../../components/layout/Header';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
@@ -31,46 +45,60 @@ export default function Reports() {
     // Auto-fill location from dashboard location permission if available
     const [locationInput, setLocationInput] = useState(() => {
         try {
-            const data = JSON.parse(sessionStorage.getItem('weatherData'));
+            const data = JSON.parse(localStorage.getItem('weatherData'));
             return data?.locationName || '';
         } catch {
             return '';
         }
     });
 
-    const submitReport = async () => {
-        if (!selectedCategory) return alert("Please select an issue type.");
+    const [position, setPosition] = useState(() => {
+        try {
+            const data = JSON.parse(localStorage.getItem('weatherData'));
+            return data?.latitude && data?.longitude ? [data.latitude, data.longitude] : null;
+        } catch {
+            return null;
+        }
+    });
+
+    const LocationMarker = () => {
+        const map = useMapEvents({
+            click(e) {
+                setPosition([e.latlng.lat, e.latlng.lng]);
+            }
+        });
         
-        setLoadingId('submit');
-        
+        useEffect(() => {
+            if (position) {
+                map.flyTo(position, map.getZoom());
+            }
+        }, [position, map]);
+
+        return position === null ? null : (
+            <Marker 
+                position={position} 
+                draggable={true} 
+                eventHandlers={{
+                    dragend: (e) => {
+                        const marker = e.target;
+                        const pos = marker.getLatLng();
+                        setPosition([pos.lat, pos.lng]);
+                    },
+                }}
+            />
+        );
+    };
+
+    const requestLocation = () => {
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by your browser.");
-            setLoadingId(null);
             return;
         }
-
+        setLoadingId('locating');
         navigator.geolocation.getCurrentPosition(
-            async (position) => {
-                try {
-                    const data = {
-                        category_id: selectedCategory.id,
-                        title: `Report: ${selectedCategory.name}`,
-                        description: description || 'No details provided.',
-                        address: locationInput,
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude
-                    };
-                    await api.post('/reports', data);
-                    await loadData();
-                    setActiveTab('history');
-                    alert('Report submitted successfully!');
-                    setSelectedCategory(null);
-                    setDescription('');
-                } catch (err) {
-                    alert('Failed to submit report');
-                } finally {
-                    setLoadingId(null);
-                }
+            (pos) => {
+                setPosition([pos.coords.latitude, pos.coords.longitude]);
+                setLoadingId(null);
             },
             () => {
                 alert('Could not get your location. Please enable location services.');
@@ -78,6 +106,35 @@ export default function Reports() {
             },
             { enableHighAccuracy: true }
         );
+    };
+
+    const submitReport = async () => {
+        if (!selectedCategory) return alert("Please select an issue type.");
+        if (!position) return alert("Please pinpoint the location on the map.");
+        
+        setLoadingId('submit');
+        
+        try {
+            const data = {
+                category_id: selectedCategory.id,
+                title: `Report: ${selectedCategory.name}`,
+                description: description || 'No details provided.',
+                address: locationInput || 'Map Coordinates',
+                latitude: position[0],
+                longitude: position[1]
+            };
+            await api.post('/reports', data);
+            await loadData();
+            setActiveTab('history');
+            alert('Report submitted successfully!');
+            setSelectedCategory(null);
+            setDescription('');
+            setLocationInput('');
+        } catch (err) {
+            alert('Failed to submit report');
+        } finally {
+            setLoadingId(null);
+        }
     };
 
     // Helper to map generic categories to nice icons and colors
@@ -142,19 +199,28 @@ export default function Reports() {
 
                     {/* Location */}
                     <div>
-                        <h3 className="text-sm font-bold text-slate-900 mb-3">Location</h3>
+                        <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-sm font-bold text-slate-900">Location</h3>
+                            <button onClick={requestLocation} disabled={loadingId === 'locating'} className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-colors">
+                                {loadingId === 'locating' ? 'Locating...' : 'Locate Me'}
+                            </button>
+                        </div>
                         <div className="relative mb-3">
                             <input type="text" value={locationInput} onChange={(e) => setLocationInput(e.target.value)} className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-4 pr-10 text-sm text-slate-900 focus:outline-none focus:border-blue-500 font-medium shadow-sm" placeholder="Search location..." />
                             <MapPin size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" />
                         </div>
-                        <div className="w-full h-32 bg-slate-200 rounded-2xl overflow-hidden relative border border-slate-100 shadow-sm">
-                            {/* Fake map image for UI mockup purposes */}
-                            <div className="absolute inset-0 opacity-40 bg-[url('https://maps.wikimedia.org/osm-intl/13/4260/3781.png')] bg-cover bg-center"></div>
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-full pb-2">
-                                <div className="w-8 h-8 text-blue-600">
-                                    <svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                        <div className="w-full h-40 bg-slate-200 rounded-2xl overflow-hidden relative border border-slate-100 shadow-sm z-0">
+                            {position ? (
+                                <MapContainer center={position} zoom={15} scrollWheelZoom={false} className="h-full w-full">
+                                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+                                    <LocationMarker />
+                                </MapContainer>
+                            ) : (
+                                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-100 text-slate-400">
+                                    <MapPin size={24} className="mb-2 opacity-50" />
+                                    <span className="text-xs font-semibold">Click "Locate Me" or enter address</span>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
 

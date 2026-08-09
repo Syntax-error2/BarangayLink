@@ -16,9 +16,62 @@ export default function Profile() {
     });
     const [loading, setLoading] = useState(false);
 
+    const fileInputRef = React.useRef(null);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
     const handleLogout = () => {
         logout();
         navigate('/login');
+    };
+
+    const compressImage = (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 400;
+                    const MAX_HEIGHT = 400;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.8));
+                };
+            };
+        });
+    };
+
+    const handleAvatarUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setUploadingAvatar(true);
+        try {
+            const base64 = await compressImage(file);
+            await api.post('/user/profile/avatar', { avatar: base64 });
+            window.location.reload();
+        } catch (err) {
+            alert('Failed to upload image');
+        } finally {
+            setUploadingAvatar(false);
+        }
     };
 
     const handleSave = async () => {
@@ -36,7 +89,7 @@ export default function Profile() {
         <div className="bg-slate-50 min-h-screen pb-24">
             
             {/* Premium Blue Header Background */}
-            <div className="bg-blue-600 pt-12 pb-24 px-6 relative overflow-hidden rounded-b-[40px]">
+            <div className="bg-blue-600 pt-16 pb-24 px-6 relative overflow-hidden rounded-b-[40px] shadow-md">
                 {/* Decorative circles */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/50 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
@@ -44,13 +97,14 @@ export default function Profile() {
                 <div className="relative z-10 flex flex-col items-center text-center">
                     <div className="relative">
                         <div className="w-24 h-24 rounded-full bg-white text-blue-600 flex items-center justify-center font-black text-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-4 border-white/20 overflow-hidden mb-4">
-                            {user?.profile?.avatar_url ? (
-                                <img src={user.profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                            {user?.profile_photo_path ? (
+                                <img src={user.profile_photo_path} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
-                                `${user?.first_name?.charAt(0)}${user?.last_name?.charAt(0)}`
+                                `${user?.first_name?.charAt(0) || ''}${user?.last_name?.charAt(0) || ''}`
                             )}
                         </div>
-                        <button className="absolute bottom-4 right-0 bg-blue-700 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white shadow-sm hover:bg-blue-800 transition-colors">
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleAvatarUpload} className="hidden" />
+                        <button disabled={uploadingAvatar} onClick={() => fileInputRef.current?.click()} className="absolute bottom-4 right-0 bg-blue-700 w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white shadow-sm hover:bg-blue-800 transition-colors disabled:opacity-50">
                             <Camera size={14} />
                         </button>
                     </div>
