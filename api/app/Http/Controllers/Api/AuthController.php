@@ -64,8 +64,7 @@ class AuthController extends Controller
         // Create empty profile
         ResidentProfile::create([
             'user_id' => $user->id,
-            'contact_number' => null,
-            'address' => null,
+            'address' => 'Not Provided',
         ]);
 
         // Send Welcome Email

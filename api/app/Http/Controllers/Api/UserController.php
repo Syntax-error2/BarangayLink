@@ -26,8 +26,8 @@ class UserController extends Controller
                     'last_name' => $user->last_name,
                     'email' => $user->email,
                     'phone' => $user->phone,
-                    'purok' => $user->residentProfile ? $user->residentProfile->purok : 'Unknown',
-                    'status' => $user->residentProfile ? $user->residentProfile->verification_status : 'pending',
+                    'purok' => ($user->residentProfile && $user->residentProfile->purok) ? $user->residentProfile->purok : 'All Puroks',
+                    'status' => ($user->residentProfile && $user->residentProfile->verification_status) ? $user->residentProfile->verification_status : 'pending',
                     'avatar' => $user->profile_photo_path,
                 ];
             });

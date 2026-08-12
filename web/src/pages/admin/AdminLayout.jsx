@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
@@ -12,6 +13,8 @@ export default function AdminLayout() {
     const { user, logout } = useAuth();
     const { unreadCounts } = useNotifications();
     const location = useLocation();
+    const [showNotifications, setShowNotifications] = useState(false);
+    const totalUnread = Object.values(unreadCounts || {}).reduce((a, b) => a + b, 0);
 
     const isActive = (path) => {
         if (path === '/admin') {
@@ -174,10 +177,60 @@ export default function AdminLayout() {
                         </div>
                         
                         {/* Notifications */}
-                        <button className="relative p-2 text-slate-400 hover:text-blue-600 transition-colors bg-white rounded-full shadow-sm border border-slate-100">
-                            <BellRing size={20} />
-                            <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] font-bold text-white flex items-center justify-center leading-none">3</span>
-                        </button>
+                        <div className="relative">
+                            <button 
+                                onClick={() => setShowNotifications(!showNotifications)}
+                                className="relative p-2 text-slate-400 hover:text-blue-600 transition-colors bg-white rounded-full shadow-sm border border-slate-100"
+                            >
+                                <BellRing size={20} />
+                                {totalUnread > 0 && (
+                                    <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 rounded-full border-2 border-white text-[9px] font-bold text-white flex items-center justify-center leading-none">
+                                        {totalUnread}
+                                    </span>
+                                )}
+                            </button>
+                            
+                            {/* Dropdown */}
+                            {showNotifications && (
+                                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-fade-in">
+                                    <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                                        <h3 className="font-bold text-slate-900">Notifications</h3>
+                                        <button className="text-xs text-blue-600 font-semibold hover:underline">Mark all as read</button>
+                                    </div>
+                                    <div className="max-h-80 overflow-y-auto">
+                                        <div className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors flex items-start gap-3 cursor-pointer">
+                                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                                                <FileText size={14} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-slate-900">New Report Submitted</p>
+                                                <p className="text-xs text-slate-500 mt-0.5">A resident submitted a new report for review.</p>
+                                                <p className="text-[10px] text-slate-400 mt-1">Just now</p>
+                                            </div>
+                                        </div>
+                                        <div className="p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors flex items-start gap-3 cursor-pointer">
+                                            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                                                <Briefcase size={14} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-slate-900">Service Request Pending</p>
+                                                <p className="text-xs text-slate-500 mt-0.5">3 new service requests require your attention.</p>
+                                                <p className="text-[10px] text-slate-400 mt-1">1 hour ago</p>
+                                            </div>
+                                        </div>
+                                        {totalUnread === 0 && (
+                                            <div className="p-8 text-center text-slate-500">
+                                                <CheckCircle size={24} className="mx-auto text-slate-300 mb-2" />
+                                                <p className="text-sm font-medium">You're all caught up!</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3 border-t border-slate-100 text-center bg-slate-50">
+                                        <button className="text-xs font-bold text-slate-600 hover:text-blue-600 transition-colors">View All Notifications</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         
                         {/* Admin Profile */}
                         <div className="flex items-center gap-3 bg-white pl-2 pr-4 py-1.5 rounded-full shadow-sm border border-slate-100 cursor-pointer hover:border-slate-300 transition-all">

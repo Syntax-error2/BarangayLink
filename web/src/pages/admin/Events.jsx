@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { 
     Calendar as CalendarIcon, Search, Plus, MapPin, 
-    Clock, Users, MoreVertical, Edit, Trash2
+    Clock, Users, MoreVertical, Edit, Trash2, X
 } from 'lucide-react';
 import api from '../../lib/axios';
 
@@ -9,6 +9,8 @@ export default function Events() {
     const [search, setSearch] = useState('');
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState({ title: '', description: '', location: '', start_date: '', end_date: '' });
 
     useEffect(() => {
         fetchEvents();
@@ -22,6 +24,29 @@ export default function Events() {
             console.error('Failed to fetch events:', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreateEvent = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post('/events', formData);
+            setShowModal(false);
+            setFormData({ title: '', description: '', location: '', start_date: '', end_date: '' });
+            fetchEvents();
+        } catch (error) {
+            console.error('Failed to create event:', error);
+            alert('Failed to create event. Please check the inputs.');
+        }
+    };
+
+    const handleDeleteEvent = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this event?')) return;
+        try {
+            await api.delete(`/events/${id}`);
+            fetchEvents();
+        } catch (error) {
+            console.error('Failed to delete event:', error);
         }
     };
 
@@ -40,7 +65,7 @@ export default function Events() {
     };
 
     return (
-        <div className="space-y-6 animate-fade-in flex flex-col h-full">
+        <div className="space-y-6 animate-fade-in flex flex-col h-full relative">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
                 <div>
@@ -50,7 +75,10 @@ export default function Events() {
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Manage barangay activities, assemblies, and programs.</p>
                 </div>
-                <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm">
+                <button 
+                    onClick={() => setShowModal(true)}
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-medium text-sm transition-colors shadow-sm"
+                >
                     <Plus size={18} />
                     Create Event
                 </button>
@@ -114,11 +142,8 @@ export default function Events() {
                                     <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors" title="Edit Event">
                                         <Edit size={18} />
                                     </button>
-                                    <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Delete Event">
+                                    <button onClick={() => handleDeleteEvent(event.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Delete Event">
                                         <Trash2 size={18} />
-                                    </button>
-                                    <button className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors" title="More Options">
-                                        <MoreVertical size={18} />
                                     </button>
                                 </div>
                             </div>
@@ -126,6 +151,72 @@ export default function Events() {
                     })}
                 </div>
             </div>
+
+            {/* Create Event Modal */}
+            {showModal && (
+                <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
+                            <h2 className="text-lg font-bold text-slate-900">Create New Event</h2>
+                            <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateEvent} className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1">Event Title</label>
+                                <input 
+                                    type="text" required
+                                    value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
+                                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1">Location</label>
+                                <input 
+                                    type="text" required
+                                    value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})}
+                                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">Start Date & Time</label>
+                                    <input 
+                                        type="datetime-local" required
+                                        value={formData.start_date} onChange={e => setFormData({...formData, start_date: e.target.value})}
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-slate-700 mb-1">End Date & Time</label>
+                                    <input 
+                                        type="datetime-local" required
+                                        value={formData.end_date} onChange={e => setFormData({...formData, end_date: e.target.value})}
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" 
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1">Description</label>
+                                <textarea 
+                                    rows="3"
+                                    value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})}
+                                    className="w-full px-4 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none" 
+                                ></textarea>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 px-4 py-2.5 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" className="flex-1 px-4 py-2.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                                    Save Event
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

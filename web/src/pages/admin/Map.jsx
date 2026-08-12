@@ -134,6 +134,12 @@ export default function AdminMap() {
                 <MapContainer 
                     center={safeCenter} 
                     zoom={14} 
+                    minZoom={13}
+                    maxBounds={[
+                        [10.12, 122.80], // SouthWest
+                        [10.28, 122.95]  // NorthEast
+                    ]}
+                    maxBoundsViscosity={1.0}
                     style={{ height: '100%', width: '100%' }}
                 >
                     <TileLayer
