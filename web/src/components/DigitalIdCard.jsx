@@ -1,6 +1,6 @@
 import React from 'react';
 import QRCode from 'react-qr-code';
-import { ShieldCheckIcon, IdentificationIcon } from '@heroicons/react/24/solid';
+import { ShieldCheck, IdCard } from 'lucide-react';
 import { getImageUrl } from '../lib/axios';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,7 +29,7 @@ const DigitalIdCard = () => {
                 {/* Header */}
                 <div className="flex w-full justify-between items-center mb-6 border-b border-white/20 pb-4">
                     <div className="flex items-center space-x-2">
-                        <ShieldCheckIcon className="h-6 w-6 text-white" />
+                        <ShieldCheck className="h-6 w-6 text-white" />
                         <span className="font-bold tracking-wider uppercase text-sm">BarangayLink ID</span>
                     </div>
                     {user.barangay && (
@@ -45,7 +45,7 @@ const DigitalIdCard = () => {
                         {user.profile_photo_path ? (
                             <img src={getImageUrl(user.profile_photo_path)} alt="Profile" className="h-full w-full object-cover" />
                         ) : (
-                            <IdentificationIcon className="h-10 w-10 text-white/70" />
+                            <IdCard className="h-10 w-10 text-white/70" />
                         )}
                     </div>
                     <div>
