@@ -5,7 +5,7 @@ import { useNotifications } from '../../context/NotificationContext';
 import { 
     LogOut, LayoutDashboard, FileText, Briefcase, Users, Bell, 
     Calendar, Folder, MessageSquare, Radio, BarChart2, Map, 
-    ShieldCheck, Settings, FileClock, Search, BellRing, ChevronDown, CheckCircle 
+    ShieldCheck, Settings, FileClock, Search, BellRing, ChevronDown, CheckCircle, Scan 
 } from 'lucide-react';
 import { getImageUrl } from '../../lib/axios';
 
@@ -61,6 +61,7 @@ export default function AdminLayout() {
                 { path: '/admin/users', icon: ShieldCheck, label: 'Users & Roles' },
                 { path: '/admin/settings', icon: Settings, label: 'Settings' },
                 { path: '/admin/audit', icon: FileClock, label: 'Audit Logs' },
+                { path: '/admin/qr-scanner', icon: Scan, label: 'QR Scanner' },
             ]
         }
     ];

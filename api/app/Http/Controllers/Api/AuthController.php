@@ -41,43 +41,52 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8',
-            'barangay_id' => 'required|exists:barangays,id',
-        ]);
-
-        $residentRole = Role::where('slug', 'resident')->first();
-
-        $user = User::create([
-            'first_name' => $validated['first_name'],
-            'last_name' => $validated['last_name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role_id' => $residentRole->id,
-            'barangay_id' => $validated['barangay_id'],
-            'is_active' => true,
-        ]);
-
-        // Create empty profile
-        ResidentProfile::create([
-            'user_id' => $user->id,
-            'address' => 'Not Provided',
-        ]);
-
-        // Send Welcome Email
         try {
-            Mail::to($user->email)->send(new WelcomeEmail($user));
-        } catch (\Exception $e) {
-            \Log::error('Failed to send welcome email: ' . $e->getMessage());
-        }
+            $validated = $request->validate([
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|min:8',
+                'barangay_id' => 'required|exists:barangays,id',
+            ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
-        $user->load('role', 'barangay');
-        
-        return response()->json(['token' => $token, 'user' => $user], 201);
+            $residentRole = Role::where('slug', 'resident')->first();
+
+            $user = User::create([
+                'first_name' => $validated['first_name'],
+                'last_name' => $validated['last_name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id' => $residentRole->id,
+                'barangay_id' => $validated['barangay_id'],
+                'is_active' => true,
+            ]);
+
+            // Create empty profile
+            ResidentProfile::create([
+                'user_id' => $user->id,
+                'address' => 'Not Provided',
+            ]);
+
+            // Send Welcome Email
+            try {
+                Mail::to($user->email)->send(new WelcomeEmail($user));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send welcome email: ' . $e->getMessage());
+            }
+
+            $token = $user->createToken('auth_token')->plainTextToken;
+            $user->load('role', 'barangay');
+            
+            return response()->json(['token' => $token, 'user' => $user], 201);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'Server Error: ' . $th->getMessage(),
+                'file' => $th->getFile(),
+                'line' => $th->getLine(),
+                'trace' => $th->getTraceAsString()
+            ], 500);
+        }
     }
 
     public function logout(Request $request)

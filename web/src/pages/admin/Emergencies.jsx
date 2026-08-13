@@ -1,6 +1,20 @@
 import { useState, useEffect } from 'react';
 import api from '../../lib/axios';
 import { Search, Filter, Eye, AlertTriangle, Phone, MapPin, Calendar, User, ChevronDown, Check, X, ShieldAlert } from 'lucide-react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { BINALBAGAN_BOUNDS } from '../../lib/mapConstants';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
+});
+L.Marker.prototype.options.icon = DefaultIcon;
 
 export default function AdminEmergencies() {
     const [emergencies, setEmergencies] = useState([]);
@@ -224,13 +238,19 @@ export default function AdminEmergencies() {
                                 </div>
                                 
                                 {selectedEmergency.latitude && selectedEmergency.longitude && (
-                                    <div className="bg-slate-100 rounded-2xl h-48 border border-slate-200 flex items-center justify-center overflow-hidden relative">
-                                        <div className="absolute inset-0 bg-slate-200 opacity-50"></div>
-                                        <div className="z-10 flex flex-col items-center">
-                                            <MapPin size={32} className="text-red-500 mb-2" />
-                                            <span className="text-sm font-bold text-slate-600">Map Interface Unavailable</span>
-                                            <span className="text-xs text-slate-500">{selectedEmergency.latitude}, {selectedEmergency.longitude}</span>
-                                        </div>
+                                    <div className="bg-slate-100 rounded-2xl h-48 border border-slate-200 overflow-hidden relative shadow-sm">
+                                        <MapContainer 
+                                            center={[selectedEmergency.latitude, selectedEmergency.longitude]} 
+                                            zoom={15} 
+                                            minZoom={13}
+                                            maxBounds={BINALBAGAN_BOUNDS}
+                                            maxBoundsViscosity={1.0}
+                                            scrollWheelZoom={false} 
+                                            className="h-full w-full z-0"
+                                        >
+                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
+                                            <Marker position={[selectedEmergency.latitude, selectedEmergency.longitude]} />
+                                        </MapContainer>
                                     </div>
                                 )}
                             </div>

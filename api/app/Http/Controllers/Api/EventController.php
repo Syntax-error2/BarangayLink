@@ -6,16 +6,20 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use Carbon\Carbon;
+use App\Services\AuditLogService;
 
 class EventController extends Controller
 {
     public function index(Request $request)
     {
-        $barangayId = $request->user()->barangay_id;
+        $user = $request->user();
+        $query = Event::query();
 
-        $events = Event::where('barangay_id', $barangayId)
-            ->orderBy('start_date', 'asc')
-            ->get();
+        if ($user->barangay_id) {
+            $query->where('barangay_id', $user->barangay_id);
+        }
+
+        $events = $query->orderBy('start_date', 'asc')->get();
 
         return response()->json($events);
     }
@@ -31,8 +35,19 @@ class EventController extends Controller
             'is_published' => 'boolean',
         ]);
 
+        $user = $request->user();
+        $barangayId = $user->barangay_id;
+        
+        // If super admin (no barangay_id), default to first barangay for now
+        if (!$barangayId) {
+            $firstBarangay = \App\Models\Barangay::first();
+            if ($firstBarangay) {
+                $barangayId = $firstBarangay->id;
+            }
+        }
+
         $event = new Event();
-        $event->barangay_id = $request->user()->barangay_id;
+        $event->barangay_id = $barangayId;
         $event->title = $request->title;
         $event->description = $request->description;
         $event->start_date = Carbon::parse($request->start_date)->format('Y-m-d H:i:s');
@@ -41,17 +56,27 @@ class EventController extends Controller
         }
         $event->location = $request->location;
         $event->is_published = $request->is_published ?? true;
-        $event->created_by = $request->user()->id;
+        $event->created_by = $user->id ?? 1;
         $event->save();
+
+        AuditLogService::log('created', 'events', 'Created event: ' . $event->title, $event->id);
 
         return response()->json($event, 201);
     }
 
     public function destroy(Request $request, $id)
     {
-        $event = Event::where('barangay_id', $request->user()->barangay_id)
-            ->findOrFail($id);
-            
+        $user = $request->user();
+        $query = Event::query();
+        
+        if ($user->barangay_id) {
+            $query->where('barangay_id', $user->barangay_id);
+        }
+
+        $event = $query->findOrFail($id);
+        
+        AuditLogService::log('deleted', 'events', 'Deleted event: ' . $event->title, $event->id);
+        
         $event->delete();
         
         return response()->json(['message' => 'Event deleted']);

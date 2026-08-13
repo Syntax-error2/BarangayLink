@@ -26,16 +26,30 @@ export default function Services() {
     const submitRequest = async (e) => {
         e.preventDefault();
         setLoading(true);
+        const data = { 
+            service_type_id: requestModal.service.id, 
+            remarks: requestModal.purpose || 'For records and reference'
+        };
         try {
-            await api.post('/service-requests', { 
-                service_type_id: requestModal.service.id, 
-                remarks: requestModal.purpose || 'For records and reference'
-            });
+            await api.post('/service-requests', data);
             await loadData();
             setRequestModal({ isOpen: false, service: null, purpose: '' });
             setActiveTab('history');
         } catch (err) {
-            alert('Failed to request service');
+            if (!err.response) {
+                import('../../lib/offlineQueue').then(({ saveToQueue }) => {
+                    saveToQueue({
+                        method: 'POST',
+                        url: '/service-requests',
+                        data: data
+                    });
+                    setRequestModal({ isOpen: false, service: null, purpose: '' });
+                    setActiveTab('history');
+                    alert('You are offline. Your request has been saved and will be sent when you reconnect.');
+                });
+            } else {
+                alert('Failed to request service');
+            }
         } finally {
             setLoading(false);
         }

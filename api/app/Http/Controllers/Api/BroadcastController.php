@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SystemAlert;
 use App\Models\Announcement;
-use App\Models\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\BroadcastMessage;
 
 class BroadcastController extends Controller
 {
@@ -21,6 +22,7 @@ class BroadcastController extends Controller
 
         $barangayId = $request->user()->barangay_id;
         $title = 'Broadcast Message';
+        $notifType = 'broadcast';
 
         if ($request->type === 'emergency' || $request->type === 'alert') {
             // Create System Alert
@@ -33,6 +35,7 @@ class BroadcastController extends Controller
                 'created_by' => $request->user()->id
             ]);
             $title = $request->type === 'emergency' ? 'EMERGENCY ALERT' : 'SYSTEM ALERT';
+            $notifType = 'emergency_alert';
         } else {
             // Create Announcement
             Announcement::create([
@@ -44,10 +47,17 @@ class BroadcastController extends Controller
                 'created_by' => $request->user()->id
             ]);
             $title = 'New Announcement';
+            $notifType = 'general_announcement';
         }
 
         // Generate Notifications for the audience
-        $query = User::where('barangay_id', $barangayId)->where('is_active', true);
+        $query = User::where('is_active', true);
+        
+        // Handle Super Admin broadcast (all barangays) or specific barangay
+        if ($barangayId) {
+            $query->where('barangay_id', $barangayId);
+        }
+
         if ($request->audience === 'residents') {
             $query->whereHas('role', function($q) { $q->where('slug', 'resident'); });
         } else if ($request->audience === 'staff') {
@@ -56,15 +66,8 @@ class BroadcastController extends Controller
 
         $users = $query->get();
 
-        // In a real app, you would chunk this or use a Queue/Job
-        foreach ($users as $user) {
-            Notification::create([
-                'user_id' => $user->id,
-                'type' => 'broadcast',
-                'title' => $title,
-                'message' => $request->message,
-                'is_read' => false
-            ]);
+        if ($users->count() > 0) {
+            Notification::send($users, new BroadcastMessage($title, $request->message, $notifType));
         }
 
         return response()->json(['message' => 'Broadcast sent successfully and notifications generated.']);

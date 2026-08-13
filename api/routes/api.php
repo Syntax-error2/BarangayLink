@@ -48,6 +48,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // New routes
     Route::get('/users/residents', [\App\Http\Controllers\Api\UserController::class, 'getResidents']);
     Route::get('/users/staff', [\App\Http\Controllers\Api\UserController::class, 'getStaff']);
+    Route::post('/admin/verify-qr', [\App\Http\Controllers\Api\UserController::class, 'verifyQr']);
     Route::apiResource('events', \App\Http\Controllers\Api\EventController::class)->except(['create', 'edit', 'show', 'update']);
     Route::get('/messages', [\App\Http\Controllers\Api\MessageController::class, 'getConversations']);
     Route::get('/messages/{userId}', [\App\Http\Controllers\Api\MessageController::class, 'getMessages']);

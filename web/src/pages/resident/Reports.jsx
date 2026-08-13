@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import { BINALBAGAN_BOUNDS } from '../../lib/mapConstants';
 
 let DefaultIcon = L.icon({
     iconUrl: icon,
@@ -211,7 +212,15 @@ export default function Reports() {
                         </div>
                         <div className="w-full h-40 bg-slate-200 rounded-2xl overflow-hidden relative border border-slate-100 shadow-sm z-0">
                             {position ? (
-                                <MapContainer center={position} zoom={15} scrollWheelZoom={false} className="h-full w-full">
+                                <MapContainer 
+                                    center={position} 
+                                    zoom={15} 
+                                    minZoom={13}
+                                    maxBounds={BINALBAGAN_BOUNDS}
+                                    maxBoundsViscosity={1.0}
+                                    scrollWheelZoom={false} 
+                                    className="h-full w-full"
+                                >
                                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution="&copy; OpenStreetMap" />
                                     <LocationMarker />
                                 </MapContainer>

@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Filter, Layers, AlertCircle, FileText } from 'lucide-react';
 import api from '../../lib/axios';
+import { BINALBAGAN_BOUNDS, BINALBAGAN_CENTER } from '../../lib/mapConstants';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -72,7 +73,7 @@ export default function AdminMap() {
         return true;
     });
 
-    const defaultCenter = [10.1983, 122.8688];
+    const defaultCenter = BINALBAGAN_CENTER;
 
     const safeCenter = points.length > 0 && points[0].lat && points[0].lng 
         ? [parseFloat(points[0].lat), parseFloat(points[0].lng)] 
@@ -135,10 +136,7 @@ export default function AdminMap() {
                     center={safeCenter} 
                     zoom={14} 
                     minZoom={13}
-                    maxBounds={[
-                        [10.12, 122.80], // SouthWest
-                        [10.28, 122.95]  // NorthEast
-                    ]}
+                    maxBounds={BINALBAGAN_BOUNDS}
                     maxBoundsViscosity={1.0}
                     style={{ height: '100%', width: '100%' }}
                 >

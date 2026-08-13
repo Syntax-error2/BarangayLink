@@ -4,7 +4,7 @@ import { LogOut, User, MapPin, Phone, Mail, ShieldCheck, Check, X, ChevronRight,
 import { useNavigate } from 'react-router-dom';
 import api from '../../lib/axios';
 import Card from '../../components/ui/Card';
-
+import DigitalIdCard from '../../components/DigitalIdCard';
 export default function Profile() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -120,6 +120,9 @@ export default function Profile() {
             </div>
             
             <div className="max-w-lg mx-auto px-5 -mt-10 relative z-20">
+                <div className="mb-6">
+                    <DigitalIdCard />
+                </div>
 
                 {/* Main Menu Options */}
                 <div className="space-y-4">

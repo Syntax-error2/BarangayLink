@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -22,8 +23,14 @@ export default {
           dark: '#4F46E5',    // Indigo 600
           light: '#EEF2FF',   // Indigo 50
         },
-        background: '#F8FAFC', // Slate 50
-        surface: '#FFFFFF',
+        background: {
+          DEFAULT: '#F8FAFC',
+          dark: '#0F172A',
+        },
+        surface: {
+          DEFAULT: '#FFFFFF',
+          dark: '#1E293B',
+        },
         text: {
           primary: '#0F172A',   // Slate 900
           secondary: '#64748B', // Slate 500

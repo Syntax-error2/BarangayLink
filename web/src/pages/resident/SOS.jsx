@@ -54,7 +54,19 @@ export default function SOS() {
                     alert('S.O.S DISPATCHED SUCCESSFULLY! Help is on the way.');
                     navigate('/resident');
                 } catch (err) {
-                    alert('CRITICAL ERROR: Failed to dispatch SOS. Please call emergency hotline immediately.');
+                    if (!err.response) {
+                        import('../../lib/offlineQueue').then(({ saveToQueue }) => {
+                            saveToQueue({
+                                method: 'POST',
+                                url: '/emergencies',
+                                data: data
+                            });
+                            alert('You are offline. Your S.O.S dispatch has been queued and will be transmitted immediately when network is restored.');
+                            navigate('/resident');
+                        });
+                    } else {
+                        alert('CRITICAL ERROR: Failed to dispatch SOS. Please call emergency hotline immediately.');
+                    }
                 } finally {
                     setLoadingId(null);
                 }

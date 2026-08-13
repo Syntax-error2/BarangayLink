@@ -1,4 +1,6 @@
 import { BrowserRouter, HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { initOfflineSync, syncOfflineQueue } from './lib/offlineQueue';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
@@ -26,6 +28,7 @@ import AdminEvents from './pages/admin/Events';
 import AdminBroadcast from './pages/admin/Broadcast';
 import AdminLogs from './pages/admin/Logs';
 import AdminDocuments from './pages/admin/Documents';
+import QRScanner from './pages/admin/QRScanner';
 import { NotificationProvider } from './context/NotificationContext';
 
 import { ResidentNotificationProvider } from './context/ResidentNotificationContext';
@@ -52,6 +55,13 @@ const RootRedirect = () => {
 };
 
 function App() {
+    useEffect(() => {
+        // Initialize offline queue listener
+        initOfflineSync();
+        // Try syncing immediately on startup
+        syncOfflineQueue();
+    }, []);
+
     const Router = isApp() ? HashRouter : BrowserRouter;
     
     return (
@@ -92,6 +102,7 @@ function App() {
                                 <Route path="documents" element={<AdminDocuments />} />
                                 <Route path="settings" element={<AdminSettings />} />
                                 <Route path="logs" element={<AdminLogs />} />
+                                <Route path="qr-scanner" element={<QRScanner />} />
                             </Route>
                         </Routes>
                     </Router>
